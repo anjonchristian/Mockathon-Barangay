@@ -1,9 +1,10 @@
 import axios from "axios";
 
-// Use your dev machine's IP address here
-const API_BASE = "http://10.0.2.2:3000/api"; // Android emulator -> host machine
-// For iOS simulator, use: http://localhost:3000/api
-// For physical device, use your machine's LAN IP: http://192.168.x.x:3000/api
+// ⚙️ CONFIG: Set your API base URL below
+// Android emulator: http://10.0.2.2:3000/api
+// iOS simulator:    http://localhost:3000/api
+// Physical device:  http://<YOUR_LAN_IP>:3000/api
+const API_BASE = "http://10.0.2.2:3000/api";
 
 export interface OcrResult {
   fullName: string | null;
@@ -64,6 +65,23 @@ const api = axios.create({
   headers: {
     Accept: "application/json",
   },
+});
+
+// Request timing interceptor for debugging
+api.interceptors.request.use((config) => {
+  if (config.url === "/ocr") {
+    (config as any)._startTime = Date.now();
+  }
+  return config;
+});
+
+api.interceptors.response.use((response) => {
+  const startTime = (response.config as any)._startTime;
+  if (startTime) {
+    const elapsed = Date.now() - startTime;
+    console.log(`OCR request took ${elapsed}ms`);
+  }
+  return response;
 });
 
 /**

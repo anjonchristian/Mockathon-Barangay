@@ -10,5 +10,10 @@ skills-lock.json
 # Dependencies
 node_modules/
 
-# Agent logs
-agent-logs/
+# Firebase service account (sensitive credentials)
+backend/service-account.json
+
+# Internal sub-agent working logs (not orchestration logs)
+agent-logs/junior-dev-*.log
+agent-logs/qa*.log
+agent-logs/senior-developer*.log

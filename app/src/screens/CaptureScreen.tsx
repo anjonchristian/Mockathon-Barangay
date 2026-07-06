@@ -22,7 +22,7 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
 
     const photo = await cameraRef.current.takePictureAsync({
       base64: true,
-      quality: 0.7,
+      quality: 0.5,
     });
 
     if (photo?.base64) {
