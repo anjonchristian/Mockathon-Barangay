@@ -77,15 +77,18 @@ export default function VideoCallScreen({
 
       // Simulate connection for demo
       setTimeout(() => {
-        if (connectionState !== "timeout" && connectionState !== "ended") {
-          setConnectionState("connected");
-          watchdogRef.current.stop();
-          if (watchdogTimerRef.current) clearInterval(watchdogTimerRef.current);
+        setConnectionState((prev) => {
+          if (prev !== "timeout" && prev !== "ended") {
+            watchdogRef.current.stop();
+            if (watchdogTimerRef.current) clearInterval(watchdogTimerRef.current);
 
-          elapsedTimerRef.current = setInterval(() => {
-            setElapsed((prev) => prev + 1);
-          }, 1000);
-        }
+            elapsedTimerRef.current = setInterval(() => {
+              setElapsed((p) => p + 1);
+            }, 1000);
+            return "connected";
+          }
+          return prev;
+        });
       }, 3000);
     } catch {
       setConnectionState("unavailable");

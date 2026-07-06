@@ -1,4 +1,4 @@
-import { Platform, Alert } from "react-native";
+import { Alert } from "react-native";
 
 export type VoiceLanguage = "en-US" | "fil-PH";
 

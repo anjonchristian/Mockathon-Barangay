@@ -14,9 +14,6 @@ import {
 import {
   sendChatMessage,
   checkStaffStatus,
-  requestCall,
-  logWatchdogTimeout,
-  WatchdogTimer,
 } from "../../services/webrtcService";
 import VideoCallScreen from "../VideoCallScreen";
 
