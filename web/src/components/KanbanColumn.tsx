@@ -1,8 +1,9 @@
-import { BarangayIDRequest } from "../lib/api";
+import { useState } from "react";
+import { type BarangayIDRequest } from "../lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
+import { RequestDetailDialog } from "./RequestDetailDialog";
 
 interface KanbanColumnProps {
   title: string;
@@ -24,6 +25,8 @@ const statusIcons: Record<string, React.ReactNode> = {
 };
 
 export function KanbanColumn({ title, status, requests, onStatusChange }: KanbanColumnProps) {
+  const [selectedRequest, setSelectedRequest] = useState<BarangayIDRequest | null>(null);
+
   return (
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 mb-4">
@@ -39,7 +42,11 @@ export function KanbanColumn({ title, status, requests, onStatusChange }: Kanban
           <p className="text-sm text-gray-500 text-center py-8">No requests</p>
         ) : (
           requests.map((req) => (
-            <Card key={req._id} className="shadow-sm">
+            <Card
+              key={req._id}
+              className="shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => setSelectedRequest(req)}
+            >
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{req.fullName}</CardTitle>
               </CardHeader>
@@ -47,35 +54,27 @@ export function KanbanColumn({ title, status, requests, onStatusChange }: Kanban
                 <div className="text-xs text-gray-500 space-y-1 mb-3">
                   <p>ID: {req.idNumber}</p>
                   <p>Type: {req.idType}</p>
-                  <p>Address: {req.address}</p>
+                  <p className="truncate">{req.address}</p>
                 </div>
-
-                {status === "pending_review" && (
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={() => onStatusChange(req._id, "approved")}
-                    >
-                      <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="flex-1"
-                      onClick={() => onStatusChange(req._id, "rejected")}
-                    >
-                      <XCircle className="w-3.5 h-3.5 mr-1" />
-                      Reject
-                    </Button>
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  <Badge className={statusColors[req.status]}>
+                    {req.status.replace("_", " ")}
+                  </Badge>
+                  <span className="text-xs text-gray-400 ml-auto">
+                    {new Date(req.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
               </CardContent>
             </Card>
           ))
         )}
       </div>
+
+      <RequestDetailDialog
+        request={selectedRequest}
+        onClose={() => setSelectedRequest(null)}
+        onStatusChange={onStatusChange}
+      />
     </div>
   );
 }

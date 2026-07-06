@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { KanbanColumn } from "./components/KanbanColumn";
 import { MissedCallsPanel } from "./components/MissedCallsPanel";
-import { fetchRequests, BarangayIDRequest, updateRequestStatus } from "./lib/api";
+import { fetchRequests, type BarangayIDRequest, updateRequestStatus } from "./lib/api";
 import { Loader2, AlertCircle } from "lucide-react";
 
 function App() {
