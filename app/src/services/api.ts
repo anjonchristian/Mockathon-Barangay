@@ -1,0 +1,136 @@
+import axios from "axios";
+
+// Use your dev machine's IP address here
+const API_BASE = "http://10.0.2.2:3000/api"; // Android emulator -> host machine
+// For iOS simulator, use: http://localhost:3000/api
+// For physical device, use your machine's LAN IP: http://192.168.x.x:3000/api
+
+export interface OcrResult {
+  fullName: string | null;
+  address: string | null;
+  birthDate: string | null;
+  gender: "Male" | "Female" | "Other" | null;
+  nationality: string | null;
+  idNumber: string | null;
+  idType: "national_id" | "barangay_id" | null;
+}
+
+export interface BarangayIDRequestPayload {
+  firebaseUid: string;
+  fullName: string;
+  address: string;
+  birthDate: string;
+  gender: "Male" | "Female" | "Other";
+  nationality: string;
+  idType: "national_id" | "barangay_id";
+  idNumber: string;
+  idPhotoBase64: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
+export interface RequestListResponse {
+  success: boolean;
+  data: BarangayIDRequestDoc[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface BarangayIDRequestDoc {
+  _id: string;
+  firebaseUid: string;
+  fullName: string;
+  address: string;
+  birthDate: string;
+  gender: string;
+  nationality: string;
+  idType: string;
+  idNumber: string;
+  idPhotoBase64: string;
+  status: "pending_review" | "approved" | "rejected";
+  staffNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const api = axios.create({
+  baseURL: API_BASE,
+  timeout: 15000,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+/**
+ * POST /api/ocr - Send ID image for OCR extraction
+ * Sends the image as multipart/form-data (actual JPEG)
+ */
+export async function extractOCR(imageBase64: string): Promise<OcrResult> {
+  // Convert base64 to blob for multipart upload
+  const byteString = atob(imageBase64);
+  const mimeType = "image/jpeg";
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type: mimeType });
+
+  const formData = new FormData();
+  formData.append("image", blob, "captured-id.jpeg");
+
+  const response = await api.post<ApiResponse<OcrResult>>("/ocr", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  if (!response.data.success) {
+    throw new Error(response.data.error || "OCR extraction failed");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * POST /api/requests - Submit a barangay ID request
+ */
+export async function submitRequest(
+  payload: BarangayIDRequestPayload
+): Promise<BarangayIDRequestDoc> {
+  const response = await api.post<ApiResponse<BarangayIDRequestDoc>>(
+    "/requests",
+    payload,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  if (!response.data.success) {
+    throw new Error(response.data.error || "Failed to submit request");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * GET /api/requests/:id - Get request status by ID
+ */
+export async function getRequestStatus(
+  id: string
+): Promise<BarangayIDRequestDoc> {
+  const response = await api.get<ApiResponse<BarangayIDRequestDoc>>(
+    `/requests/${id}`
+  );
+
+  if (!response.data.success) {
+    throw new Error(response.data.error || "Failed to fetch request status");
+  }
+
+  return response.data.data;
+}
