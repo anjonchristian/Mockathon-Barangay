@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useRequests } from "@/hooks/useRequests";
 import { useMissedCalls } from "@/hooks/useMissedCalls";
@@ -457,10 +458,47 @@ export default function DashboardPage() {
     declineCall,
   } = useSignaling();
 
-  const pending = cards.filter((c) => c.status === "pending");
-  const processing = cards.filter((c) => c.status === "processing");
-  const pickup = cards.filter((c) => c.status === "pickup");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const filteredCards = searchQuery
+    ? cards.filter((c) =>
+        c.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.docType.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : cards;
+
+  const pending = filteredCards.filter((c) => c.status === "pending");
+  const processing = filteredCards.filter((c) => c.status === "processing");
+  const pickup = filteredCards.filter((c) => c.status === "pickup");
   const pendingCount = pending.length + processing.length;
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleBatchApprove = useCallback(async () => {
+    const ids = Array.from(selectedIds);
+    for (const id of ids) {
+      await approve(id);
+    }
+    setSelectedIds(new Set());
+    toast.success(`Approved ${ids.length} request(s)`);
+  }, [selectedIds, approve]);
+
+  const handleBatchReject = useCallback(async () => {
+    const ids = Array.from(selectedIds);
+    for (const id of ids) {
+      await reject(id);
+    }
+    setSelectedIds(new Set());
+    toast.success(`Rejected ${ids.length} request(s)`);
+  }, [selectedIds, reject]);
 
   if (loading) {
     return (
@@ -493,22 +531,58 @@ export default function DashboardPage() {
       <div className="gap-x-6 gap-y-6 grid grid-cols-3 w-full items-start">
         {/* Kanban board (col 1–2) */}
         <div className="col-span-2 flex flex-col gap-4 items-start">
-          {/* Heading + filter */}
-          <div className="flex flex-col items-start pb-2 w-full shrink-0">
+          {/* Heading + search + batch actions */}
+          <div className="flex flex-col gap-2 items-start pb-2 w-full shrink-0">
             <div className="flex items-center justify-between w-full">
               <p className="font-semibold text-[24px] leading-[31.2px] text-[#0b1c30] whitespace-nowrap">
                 Document Requests
               </p>
-              <button
-                className="flex gap-2 h-12 items-center px-[17px] py-px rounded-sm shrink-0 hover:bg-black/5 transition-colors"
-                style={{ border: "1px solid #c4c5d5" }}
-              >
-                <SvgIcon name="p2889b5c0" vb="0 0 18 12" w={18} h={12} fill="#444653" />
-                <span className="font-medium text-[16px] leading-6 text-[#444653] text-center whitespace-nowrap">
-                  Filter
-                </span>
-              </button>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="Search requests..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-10 w-48 rounded-sm px-3 text-[14px] text-[#0b1c30] bg-white"
+                  style={{ border: "1px solid #c4c5d5" }}
+                />
+                <button
+                  className="flex gap-2 h-10 items-center px-[17px] py-px rounded-sm shrink-0 hover:bg-black/5 transition-colors"
+                  style={{ border: "1px solid #c4c5d5" }}
+                >
+                  <SvgIcon name="p2889b5c0" vb="0 0 18 12" w={18} h={12} fill="#444653" />
+                  <span className="font-medium text-[14px] leading-6 text-[#444653] text-center whitespace-nowrap">
+                    Filter
+                  </span>
+                </button>
+              </div>
             </div>
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-3 bg-[#eff4ff] px-4 py-2 rounded-sm w-full" style={{ border: "1px solid #c4c5d5" }}>
+                <span className="text-[14px] font-medium text-[#0b1c30]">
+                  {selectedIds.size} selected
+                </span>
+                <button
+                  onClick={handleBatchApprove}
+                  className="bg-[#002576] text-white text-[13px] font-medium px-4 py-1.5 rounded-sm hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  Approve All
+                </button>
+                <button
+                  onClick={handleBatchReject}
+                  className="bg-white text-[#dc2626] text-[13px] font-medium px-4 py-1.5 rounded-sm hover:bg-red-50 transition-colors cursor-pointer"
+                  style={{ border: "1px solid #dc2626" }}
+                >
+                  Reject All
+                </button>
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="text-[13px] text-[#747685] hover:text-[#0b1c30] cursor-pointer ml-auto"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Kanban columns */}

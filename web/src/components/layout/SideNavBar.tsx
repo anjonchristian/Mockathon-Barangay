@@ -17,6 +17,26 @@ const NAV_ITEMS = [
     icon: { name: "pf86ae00" as keyof typeof svgPaths, vb: "0 0 18 18", w: 18, h: 18 },
   },
   {
+    to: "/e-blotter",
+    label: "e-Blotter",
+    icon: { name: "pf86ae00" as keyof typeof svgPaths, vb: "0 0 18 18", w: 18, h: 18 },
+  },
+  {
+    to: "/emergency",
+    label: "Broadcast",
+    icon: { name: "p2d9a1e80" as keyof typeof svgPaths, vb: "0 0 17 20", w: 17, h: 20 },
+  },
+  {
+    to: "/staff",
+    label: "Staff",
+    icon: { name: "p2d9a1e80" as keyof typeof svgPaths, vb: "0 0 17 20", w: 17, h: 20 },
+  },
+  {
+    to: "/analytics",
+    label: "Analytics",
+    icon: { name: "p191dcc80" as keyof typeof svgPaths, vb: "0 0 18 18", w: 18, h: 18 },
+  },
+  {
     to: "/settings",
     label: "Settings",
     icon: { name: "p3cdadd00" as keyof typeof svgPaths, vb: "0 0 20.1 20", w: 20.1, h: 20 },
