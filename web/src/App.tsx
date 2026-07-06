@@ -3,18 +3,19 @@ import { KanbanColumn } from "./components/KanbanColumn";
 import { MissedCallsPanel } from "./components/MissedCallsPanel";
 import { Toaster } from "./components/ui/sonner";
 import { Skeleton } from "./components/ui/skeleton";
+import { Button } from "./components/ui/button";
 import { fetchRequests, type BarangayIDRequest, updateRequestStatus } from "./lib/api";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, X } from "lucide-react";
 import { toast } from "sonner";
 
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       {[1, 2, 3].map((col) => (
-        <div key={col} className="flex-1 min-w-0 space-y-3">
+        <div key={col} className="flex-1 min-w-0 flex flex-col gap-3">
           <Skeleton className="h-8 w-32" />
           {[1, 2, 3].map((card) => (
-            <div key={card} className="rounded-lg border p-4 space-y-3">
+            <div key={card} className="rounded-lg border p-4 flex flex-col gap-3">
               <Skeleton className="h-5 w-3/4" />
               <Skeleton className="h-3 w-1/2" />
               <Skeleton className="h-3 w-full" />
@@ -72,38 +73,44 @@ function App() {
   const rejectedRequests = requests.filter((r) => r.status === "rejected");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Toaster />
       {/* Top navbar */}
-      <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+      <header className="bg-card border-b border-border px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-gray-900">e-Kap Admin</h1>
-          <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+          <h1 className="text-xl font-bold text-foreground">e-Kap Admin</h1>
+          <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
             {loading ? "..." : `${pendingRequests.length} pending`}
           </span>
         </div>
-        <button
+        <Button
+          variant="link"
           onClick={() => setShowMissedCalls(!showMissedCalls)}
-          className="text-sm text-gray-600 hover:text-gray-900 underline"
         >
           {showMissedCalls ? "Hide" : "Show"} Missed Calls
-        </button>
+        </Button>
       </header>
 
       {/* Error banner */}
       {error && (
-        <div className="bg-red-50 border-b border-red-200 px-6 py-3 flex items-center gap-2 text-red-700 text-sm">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="bg-destructive/10 border-b border-destructive/20 px-6 py-3 flex items-center gap-2 text-destructive text-sm">
+          <AlertCircle className="size-4 shrink-0" />
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto font-medium hover:underline">
-            Dismiss
-          </button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setError(null)}
+            className="ml-auto h-auto py-0.5"
+          >
+            <X className="size-3.5" />
+            <span className="sr-only">Dismiss</span>
+          </Button>
         </div>
       )}
 
       {/* Missed calls panel */}
       {showMissedCalls && (
-        <div className="border-b border-gray-200">
+        <div className="border-b border-border">
           <MissedCallsPanel />
         </div>
       )}

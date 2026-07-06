@@ -12,16 +12,16 @@ interface KanbanColumnProps {
   onStatusChange: (id: string, status: "approved" | "rejected", notes?: string) => void;
 }
 
-const statusColors: Record<string, string> = {
-  pending_review: "bg-yellow-100 text-yellow-800",
-  approved: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-800",
+const statusVariants: Record<BarangayIDRequest["status"], "secondary" | "default" | "destructive"> = {
+  pending_review: "secondary",
+  approved: "default",
+  rejected: "destructive",
 };
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending_review: <Clock className="w-4 h-4" />,
-  approved: <CheckCircle2 className="w-4 h-4" />,
-  rejected: <XCircle className="w-4 h-4" />,
+  pending_review: <Clock className="size-4" />,
+  approved: <CheckCircle2 className="size-4" />,
+  rejected: <XCircle className="size-4" />,
 };
 
 export function KanbanColumn({ title, status, requests, onStatusChange }: KanbanColumnProps) {
@@ -31,15 +31,15 @@ export function KanbanColumn({ title, status, requests, onStatusChange }: Kanban
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 mb-4">
         {statusIcons[status]}
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-lg font-semibold text-foreground">{title}</h2>
         <Badge variant="secondary" className="ml-auto">
           {requests.length}
         </Badge>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         {requests.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-8">No requests</p>
+          <p className="text-sm text-muted-foreground text-center py-8">No requests</p>
         ) : (
           requests.map((req) => (
             <Card
@@ -51,16 +51,16 @@ export function KanbanColumn({ title, status, requests, onStatusChange }: Kanban
                 <CardTitle className="text-base">{req.fullName}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-xs text-gray-500 space-y-1 mb-3">
+                <div className="flex flex-col gap-1 text-xs text-muted-foreground mb-3">
                   <p>ID: {req.idNumber}</p>
                   <p>Type: {req.idType}</p>
                   <p className="truncate">{req.address}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge className={statusColors[req.status]}>
+                  <Badge variant={statusVariants[req.status]}>
                     {req.status.replace("_", " ")}
                   </Badge>
-                  <span className="text-xs text-gray-400 ml-auto">
+                  <span className="text-xs text-muted-foreground ml-auto">
                     {new Date(req.createdAt).toLocaleDateString()}
                   </span>
                 </div>

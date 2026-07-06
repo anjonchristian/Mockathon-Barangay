@@ -60,7 +60,7 @@ export function RequestDetailDialog({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* ID Photo */}
-          <div className="bg-gray-100 rounded-lg overflow-hidden">
+          <div className="bg-muted rounded-lg overflow-hidden">
             <img
               src={`data:image/jpeg;base64,${request.idPhotoBase64}`}
               alt="ID Photo"
@@ -69,33 +69,33 @@ export function RequestDetailDialog({
           </div>
 
           {/* Fields */}
-          <div className="space-y-3 text-sm">
+          <div className="flex flex-col gap-3 text-sm">
             <div>
-              <span className="text-gray-500">Full Name</span>
+              <span className="text-muted-foreground">Full Name</span>
               <p className="font-medium text-base">{request.fullName}</p>
             </div>
             <div>
-              <span className="text-gray-500">Address</span>
+              <span className="text-muted-foreground">Address</span>
               <p className="font-medium">{request.address}</p>
             </div>
             <div>
-              <span className="text-gray-500">Birth Date</span>
+              <span className="text-muted-foreground">Birth Date</span>
               <p className="font-medium">{request.birthDate}</p>
             </div>
             <div>
-              <span className="text-gray-500">Gender</span>
+              <span className="text-muted-foreground">Gender</span>
               <p className="font-medium">{request.gender}</p>
             </div>
             <div>
-              <span className="text-gray-500">Nationality</span>
+              <span className="text-muted-foreground">Nationality</span>
               <p className="font-medium">{request.nationality}</p>
             </div>
             <div>
-              <span className="text-gray-500">ID Number</span>
+              <span className="text-muted-foreground">ID Number</span>
               <p className="font-medium">{request.idNumber}</p>
             </div>
             <div>
-              <span className="text-gray-500">ID Type</span>
+              <span className="text-muted-foreground">ID Type</span>
               <p className="font-medium capitalize">{request.idType.replace("_", " ")}</p>
             </div>
           </div>
@@ -103,7 +103,7 @@ export function RequestDetailDialog({
 
         {/* Staff notes */}
         <div className="mt-2">
-          <label className="text-sm text-gray-500 block mb-1">Staff Notes</label>
+          <label className="text-sm text-muted-foreground block mb-1">Staff Notes</label>
           <Textarea
             placeholder="Add notes (optional)..."
             value={staffNotes}
@@ -132,7 +132,7 @@ export function RequestDetailDialog({
                     onClick={handleReject}
                     disabled={actionLoading}
                   >
-                    <XCircle className="w-4 h-4 mr-1" />
+                    <XCircle data-icon="inline-start" />
                     Confirm Reject
                   </Button>
                 </div>
@@ -143,15 +143,15 @@ export function RequestDetailDialog({
                     onClick={handleReject}
                     disabled={actionLoading}
                   >
-                    <XCircle className="w-4 h-4 mr-1" />
+                    <XCircle data-icon="inline-start" />
                     Reject
                   </Button>
                   <Button
-                    className="bg-green-600 hover:bg-green-700"
+                    variant="default"
                     onClick={handleApprove}
                     disabled={actionLoading}
                   >
-                    <CheckCircle2 className="w-4 h-4 mr-1" />
+                    <CheckCircle2 data-icon="inline-start" />
                     Approve
                   </Button>
                 </>

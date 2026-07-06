@@ -27,15 +27,15 @@ export function MissedCallsPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-4">
-        <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (visibleCalls.length === 0) {
     return (
-      <div className="px-6 py-4 text-sm text-gray-500 flex items-center gap-2">
-        <PhoneMissed className="w-4 h-4" />
+      <div className="px-6 py-4 text-sm text-muted-foreground flex items-center gap-2">
+        <PhoneMissed className="size-4" />
         No missed calls
       </div>
     );
@@ -43,15 +43,15 @@ export function MissedCallsPanel() {
 
   return (
     <div className="px-6 py-4">
-      <h3 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-        <PhoneMissed className="w-4 h-4" />
+      <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+        <PhoneMissed className="size-4" />
         Missed Calls ({visibleCalls.length})
       </h3>
-      <ul className="space-y-2">
+      <ul className="flex flex-col gap-2">
         {visibleCalls.map((call) => (
           <li
             key={call._id}
-            className="flex items-center justify-between text-sm text-gray-600 bg-gray-50 rounded px-3 py-2"
+            className="flex items-center justify-between text-sm text-muted-foreground bg-muted/30 rounded px-3 py-2"
           >
             <span>
               {new Date(call.requestedAt).toLocaleString()} — UID:{" "}
@@ -61,9 +61,9 @@ export function MissedCallsPanel() {
               variant="ghost"
               size="sm"
               onClick={() => setDismissed((prev) => new Set(prev).add(call._id))}
-              className="h-6 w-6 p-0"
+              className="size-6 p-0"
             >
-              <X className="w-3 h-3" />
+              <X className="size-3" />
             </Button>
           </li>
         ))}
