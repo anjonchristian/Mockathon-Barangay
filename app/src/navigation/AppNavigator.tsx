@@ -2,28 +2,42 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { type NativeStackScreenProps } from "@react-navigation/native";
 import WelcomeScreen from "../screens/WelcomeScreen";
+import RegistrationScreen from "../screens/onboarding/RegistrationScreen";
+import MainTabNavigator from "./MainTabNavigator";
 import CaptureScreen from "../screens/CaptureScreen";
 import ReviewScreen from "../screens/ReviewScreen";
 import StatusScreen from "../screens/StatusScreen";
 
 export type RootStackParamList = {
   Welcome: undefined;
+  Registration: undefined;
   Capture: undefined;
   Review: { imageBase64: string };
   Status: { requestId: string };
+  MainTabs: undefined;
 };
 
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, "Welcome">;
+type RegistrationScreenProps = NativeStackScreenProps<RootStackParamList, "Registration">;
 type CaptureScreenProps = NativeStackScreenProps<RootStackParamList, "Capture">;
 type ReviewScreenProps = NativeStackScreenProps<RootStackParamList, "Review">;
 type StatusScreenProps = NativeStackScreenProps<RootStackParamList, "Status">;
+type MainTabsProps = NativeStackScreenProps<RootStackParamList, "MainTabs">;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function WelcomeScreenWrapper({ navigation }: WelcomeScreenProps) {
   return (
     <WelcomeScreen
-      onGetStarted={() => navigation.navigate("Capture")}
+      onGetStarted={() => navigation.navigate("Registration")}
+    />
+  );
+}
+
+function RegistrationScreenWrapper({ navigation }: RegistrationScreenProps) {
+  return (
+    <RegistrationScreen
+      onComplete={() => navigation.replace("MainTabs")}
     />
   );
 }
@@ -56,10 +70,14 @@ function StatusScreenWrapper({ route, navigation }: StatusScreenProps) {
       requestId={requestId}
       onDone={() => navigation.reset({
         index: 0,
-        routes: [{ name: "Welcome" }],
+        routes: [{ name: "MainTabs" }],
       })}
     />
   );
+}
+
+function MainTabsWrapper({ navigation }: MainTabsProps) {
+  return <MainTabNavigator />;
 }
 
 export default function AppNavigator() {
@@ -86,6 +104,14 @@ export default function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="Registration"
+          component={RegistrationScreenWrapper}
+          options={{
+            title: "Registration",
+            headerBackAccessibilityLabel: "Go back to welcome",
+          }}
+        />
+        <Stack.Screen
           name="Capture"
           component={CaptureScreenWrapper}
           options={{
@@ -109,6 +135,11 @@ export default function AppNavigator() {
             headerBackButtonDisplayMode: "minimal",
             gestureEnabled: false, // Prevent going back from status
           }}
+        />
+        <Stack.Screen
+          name="MainTabs"
+          component={MainTabsWrapper}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

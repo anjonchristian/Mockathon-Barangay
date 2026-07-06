@@ -97,9 +97,12 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
     <View style={styles.container}>
       <CameraView
         ref={cameraRef}
-        style={StyleSheet.absoluteFillObject}
+        style={styles.camera}
         facing="back"
-      >
+      />
+      
+      {/* UI Overlay - positioned absolutely on top of camera */}
+      <View style={styles.overlayContainer}>
         {/* Top instruction bar */}
         <View style={styles.instructionBar}>
           <Text style={styles.instructionText}>
@@ -132,7 +135,7 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
             Tap the button to take a photo
           </Text>
         </View>
-      </CameraView>
+      </View>
     </View>
   );
 }
@@ -141,6 +144,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#000",
+  },
+  camera: {
+    flex: 1,
+  },
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "space-between",
   },
   permissionContent: {
     flex: 1,
@@ -246,6 +256,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    pointerEvents: "none", // Let touches pass through to camera if needed
   },
   idFrame: {
     width: "80%",

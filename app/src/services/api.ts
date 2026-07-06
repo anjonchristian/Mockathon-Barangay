@@ -26,6 +26,29 @@ export interface BarangayIDRequestPayload {
   idPhotoBase64: string;
 }
 
+export interface RegistrationPayload {
+  firebaseUid: string;
+  email?: string;
+  phoneNumber?: string;
+  fullName: string;
+  regionCode: string;
+  regionName: string;
+  provinceCode: string;
+  provinceName: string;
+  cityMunicipalityCode: string;
+  cityMunicipalityName: string;
+  cityMunicipalityType: "city" | "municipality";
+  barangayCode: string;
+  barangayName: string;
+  idPhotoBase64: string;
+  idType: "national_id" | "barangay_id" | "other";
+  idNumber?: string;
+  address?: string;
+  birthDate?: string;
+  gender?: "Male" | "Female" | "Other";
+  nationality?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -146,6 +169,44 @@ export async function getRequestStatus(
 
   if (!response.data.success) {
     throw new Error(response.data.error || "Failed to fetch request status");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * POST /api/registration - Register a new user
+ */
+export async function registerUser(
+  payload: RegistrationPayload
+): Promise<{ userId: string; verificationStatus: string }> {
+  const response = await api.post<ApiResponse<{ userId: string; verificationStatus: string }>>(
+    "/registration",
+    payload,
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  if (!response.data.success) {
+    throw new Error(response.data.error || "Failed to register user");
+  }
+
+  return response.data.data;
+}
+
+/**
+ * GET /api/registration/:firebaseUid - Get user registration status
+ */
+export async function getRegistrationStatus(
+  firebaseUid: string
+): Promise<{ userId: string; verificationStatus: string; isVerified: boolean }> {
+  const response = await api.get<
+    ApiResponse<{ userId: string; verificationStatus: string; isVerified: boolean }>
+  >(`/registration/${firebaseUid}`);
+
+  if (!response.data.success) {
+    throw new Error(response.data.error || "Failed to fetch registration status");
   }
 
   return response.data.data;

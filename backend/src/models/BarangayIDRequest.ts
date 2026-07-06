@@ -10,6 +10,13 @@ export interface IBarangayIDRequest extends Document {
   idType: "national_id" | "barangay_id";
   idNumber: string;
   idPhotoBase64: string;
+  // PSGC Location Data
+  regionCode?: string;
+  regionName?: string;
+  cityMunicipalityCode?: string;
+  cityMunicipalityName?: string;
+  barangayCode?: string;
+  barangayName?: string;
   status: "pending_review" | "approved" | "rejected";
   staffNotes?: string;
   createdAt: Date;
@@ -27,6 +34,13 @@ const BarangayIDRequestSchema = new Schema<IBarangayIDRequest>(
     idType: { type: String, enum: ["national_id", "barangay_id"], required: true },
     idNumber: { type: String, required: true },
     idPhotoBase64: { type: String, required: true },
+    // PSGC Location Data
+    regionCode: { type: String },
+    regionName: { type: String },
+    cityMunicipalityCode: { type: String },
+    cityMunicipalityName: { type: String },
+    barangayCode: { type: String },
+    barangayName: { type: String },
     status: {
       type: String,
       enum: ["pending_review", "approved", "rejected"],

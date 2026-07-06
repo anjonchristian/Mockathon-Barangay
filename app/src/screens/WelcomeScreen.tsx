@@ -15,7 +15,7 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
         <Text style={styles.title}>Welcome to e-Kap</Text>
         
         <Text style={styles.subtitle}>
-          Your digital Barangay ID is just a few taps away. Capture your ID, review the details, and submit your request.
+          Your digital Barangay ID is just a few taps away. Complete your registration, access services, and stay connected with your community.
         </Text>
 
         <View style={styles.stepsContainer}>
@@ -23,21 +23,21 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>1</Text>
             </View>
-            <Text style={styles.stepText}>Capture your ID</Text>
+            <Text style={styles.stepText}>Complete registration</Text>
           </View>
           
           <View style={styles.step}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>2</Text>
             </View>
-            <Text style={styles.stepText}>Review details</Text>
+            <Text style={styles.stepText}>Access services</Text>
           </View>
           
           <View style={styles.step}>
             <View style={styles.stepNumber}>
               <Text style={styles.stepNumberText}>3</Text>
             </View>
-            <Text style={styles.stepText}>Submit request</Text>
+            <Text style={styles.stepText}>Stay connected</Text>
           </View>
         </View>
       </View>
@@ -45,9 +45,9 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
       <TouchableOpacity
         style={styles.button}
         onPress={onGetStarted}
-        accessibilityLabel="Get started with ID capture"
+        accessibilityLabel="Get started with registration"
         accessibilityRole="button"
-        accessibilityHint="Navigates to the camera screen to capture your ID"
+        accessibilityHint="Navigates to the registration screen to complete your profile"
       >
         <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>

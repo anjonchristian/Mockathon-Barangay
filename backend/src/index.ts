@@ -6,6 +6,9 @@ import { createWebSocketServer } from "./ws.js";
 import ocrRouter from "./routes/ocr.js";
 import requestsRouter from "./routes/requests.js";
 import watchdogRouter from "./routes/watchdog.js";
+import registrationRouter from "./routes/registration.js";
+import chatRouter from "./routes/chat.js";
+import webrtcRouter from "./routes/webrtc.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -25,6 +28,9 @@ app.get("/", (_req, res) => {
 app.use("/api/ocr", ocrRouter);
 app.use("/api/requests", requestsRouter);
 app.use("/api/watchdog", watchdogRouter);
+app.use("/api/registration", registrationRouter);
+app.use("/api/chat", chatRouter);
+app.use("/api/webrtc", webrtcRouter);
 
 // Start server
 async function start() {
