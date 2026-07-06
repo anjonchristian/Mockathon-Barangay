@@ -25,6 +25,25 @@ Collaborate with me to create a comprehensive draft Product Requirements Documen
 
 
 
+We have 3 target roles for this application
+1. Administrator
+2. Staff / Barangay Secretary
+3. Resident
+
+This is a monorepo containing 3 projects: 
+1. web - the web application for the barangay
+2. server - the server application for the barangay
+3. app - the mobile application for the barangay
+
+The app is for the residents 
+web app is a dashboard for barangay staffs
+
+the app name is called "e-Kap"
+
+ 
+
+
+
 
 
 --- BRAINDUMP END ---
