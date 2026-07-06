@@ -15,6 +15,7 @@ export type RootStackParamList = {
   Review: { imageBase64: string };
   Status: { requestId: string };
   MainTabs: undefined;
+  VideoCall: { userId: string };
 };
 
 type WelcomeScreenProps = NativeStackScreenProps<RootStackParamList, "Welcome">;
