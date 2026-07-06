@@ -2,3 +2,13 @@ skills-lock.json
 
 .agents
 .opencode
+
+# Environment files
+.env
+.env.*
+
+# Dependencies
+node_modules/
+
+# Agent logs
+agent-logs/
