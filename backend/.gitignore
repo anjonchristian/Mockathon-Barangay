@@ -1,1 +1,11 @@
 node_modules
+
+# Environment files
+.env
+.env.local
+.env.*.local
+# Keep .env.example files
+!.env.example
+
+# Firebase service account (sensitive credentials)
+service-account.json

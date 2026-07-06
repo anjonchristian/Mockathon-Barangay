@@ -5,7 +5,10 @@ skills-lock.json
 
 # Environment files
 .env
-.env.*
+.env.local
+.env.*.local
+# Keep .env.example files
+!.env.example
 
 # Dependencies
 node_modules/
@@ -17,3 +20,5 @@ backend/service-account.json
 agent-logs/junior-dev-*.log
 agent-logs/qa*.log
 agent-logs/senior-developer*.log
+
+.devin

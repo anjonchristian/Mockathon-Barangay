@@ -43,12 +43,19 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
   if (!permission?.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.permissionText}>Camera permission is required to capture your ID.</Text>
+        <View style={styles.permissionContent}>
+          <Text style={styles.permissionIcon}>📷</Text>
+          <Text style={styles.permissionText}>Camera permission is required to capture your ID.</Text>
+          <Text style={styles.permissionSubtext}>
+            We need access to your camera to take a photo of your ID card. Your photos are processed securely and never shared.
+          </Text>
+        </View>
         <TouchableOpacity
           style={styles.permissionButton}
           onPress={requestPermission}
           accessibilityLabel="Grant camera permission"
           accessibilityRole="button"
+          accessibilityHint="Allow the app to access your camera to take ID photos"
         >
           <Text style={styles.permissionButtonText}>Grant Permission</Text>
         </TouchableOpacity>
@@ -93,10 +100,20 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
         style={StyleSheet.absoluteFillObject}
         facing="back"
       >
+        {/* Top instruction bar */}
+        <View style={styles.instructionBar}>
+          <Text style={styles.instructionText}>
+            Position your ID within the frame
+          </Text>
+        </View>
+
         {/* ID Card frame guide overlay */}
         <View style={styles.overlay}>
           <View style={styles.idFrame}>
             <Text style={styles.frameText}>Align your ID here</Text>
+            <Text style={styles.frameSubtext}>
+              Make sure all text is clearly visible
+            </Text>
           </View>
         </View>
 
@@ -107,9 +124,13 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
             onPress={handleCapture}
             accessibilityLabel="Capture ID photo"
             accessibilityRole="button"
+            accessibilityHint="Take a photo of your ID card"
           >
             <View style={styles.captureInner} />
           </TouchableOpacity>
+          <Text style={styles.captureHint}>
+            Tap the button to take a photo
+          </Text>
         </View>
       </CameraView>
     </View>
@@ -121,12 +142,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#000",
   },
+  permissionContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  permissionIcon: {
+    fontSize: 64,
+    marginBottom: 24,
+  },
   permissionText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: "bold",
     textAlign: "center",
-    paddingHorizontal: 32,
-    marginBottom: 24,
+    marginBottom: 16,
+  },
+  permissionSubtext: {
+    color: "#ccc",
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 24,
+    marginBottom: 32,
   },
   permissionButton: {
     backgroundColor: "#fff",
@@ -136,6 +174,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 48,
   },
   permissionButtonText: {
     color: "#000",
@@ -185,6 +224,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
+  instructionBar: {
+    position: "absolute",
+    top: 48,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  instructionText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
   overlay: {
     flex: 1,
     justifyContent: "center",
@@ -193,7 +250,7 @@ const styles = StyleSheet.create({
   idFrame: {
     width: "80%",
     height: "45%",
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: "#fff",
     borderRadius: 16,
     justifyContent: "center",
@@ -202,8 +259,15 @@ const styles = StyleSheet.create({
   },
   frameText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  frameSubtext: {
+    color: "#fff",
+    fontSize: 14,
     opacity: 0.8,
+    textAlign: "center",
   },
   captureBar: {
     position: "absolute",
@@ -211,6 +275,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
+  },
+  captureHint: {
+    color: "#fff",
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: "center",
   },
   captureButton: {
     width: 72,

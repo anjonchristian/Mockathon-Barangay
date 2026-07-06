@@ -105,16 +105,21 @@ export default function ReviewScreen({
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#000" />
-        <Text style={styles.loadingText}>Extracting information from your ID...</Text>
-        {error && (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={performOCR}>
-              <Text style={styles.retryButtonText}>Retry OCR</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#22c55e" />
+          <Text style={styles.loadingText}>Extracting information from your ID...</Text>
+          <Text style={styles.loadingSubtext}>
+            This may take a few moments. Please wait.
+          </Text>
+          {error && (
+            <View style={styles.errorBox}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={performOCR}>
+                <Text style={styles.retryButtonText}>Retry OCR</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
     );
   }
@@ -133,6 +138,9 @@ export default function ReviewScreen({
       {/* Bottom 60%: Form fields */}
       <ScrollView style={styles.formSection} contentContainerStyle={styles.formContent}>
         <Text style={styles.sectionTitle}>Review & Correct</Text>
+        <Text style={styles.sectionSubtitle}>
+          Please check the information below. You can edit any field if needed.
+        </Text>
 
         <Text style={styles.label}>Full Name *</Text>
         <TextInput
@@ -142,6 +150,7 @@ export default function ReviewScreen({
           placeholder="Full Name"
           placeholderTextColor="#999"
           accessibilityLabel="Full Name"
+          accessibilityHint="Enter your complete name as shown on your ID"
         />
 
         <Text style={styles.label}>Address *</Text>
@@ -153,6 +162,7 @@ export default function ReviewScreen({
           placeholderTextColor="#999"
           multiline
           accessibilityLabel="Address"
+          accessibilityHint="Enter your complete residential address"
         />
 
         <Text style={styles.label}>Birth Date *</Text>
@@ -163,6 +173,7 @@ export default function ReviewScreen({
           placeholder="YYYY-MM-DD"
           placeholderTextColor="#999"
           accessibilityLabel="Birth Date"
+          accessibilityHint="Enter your birth date in year-month-day format"
         />
 
         <Text style={styles.label}>Gender *</Text>
@@ -173,6 +184,7 @@ export default function ReviewScreen({
           placeholder="Male / Female / Other"
           placeholderTextColor="#999"
           accessibilityLabel="Gender"
+          accessibilityHint="Enter your gender: Male, Female, or Other"
         />
 
         <Text style={styles.label}>Nationality</Text>
@@ -183,6 +195,7 @@ export default function ReviewScreen({
           placeholder="Nationality"
           placeholderTextColor="#999"
           accessibilityLabel="Nationality"
+          accessibilityHint="Enter your nationality"
         />
 
         <Text style={styles.label}>ID Number</Text>
@@ -191,6 +204,7 @@ export default function ReviewScreen({
           value={idNumber}
           editable={false}
           accessibilityLabel="ID Number"
+          accessibilityHint="ID number extracted from your photo"
         />
 
         {/* Error display */}
@@ -233,11 +247,25 @@ export default function ReviewScreen({
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
   loadingText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+    textAlign: "center",
+    marginTop: 24,
+    paddingHorizontal: 32,
+  },
+  loadingSubtext: {
     fontSize: 16,
     color: "#666",
     textAlign: "center",
-    marginTop: 16,
+    marginTop: 8,
     paddingHorizontal: 32,
   },
   photoSection: {
@@ -250,7 +278,8 @@ const styles = StyleSheet.create({
   idPhoto: { width: "100%", height: "100%" },
   formSection: { flex: 1 },
   formContent: { padding: 20, paddingBottom: 40 },
-  sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 16, color: "#000" },
+  sectionTitle: { fontSize: 22, fontWeight: "bold", marginBottom: 8, color: "#000" },
+  sectionSubtitle: { fontSize: 16, color: "#666", marginBottom: 20, lineHeight: 22 },
   label: { fontSize: 16, fontWeight: "600", color: "#333", marginBottom: 6, marginTop: 12 },
   input: {
     borderWidth: 1,

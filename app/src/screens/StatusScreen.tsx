@@ -39,6 +39,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
           icon: "✅",
           title: "Approved!",
           subtitle: "Your Barangay ID request has been approved.",
+          instruction: "You may now visit the barangay hall to claim your ID.",
           color: "#22c55e",
         };
       case "rejected":
@@ -47,6 +48,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
           title: "Not Approved",
           subtitle:
             "Your Barangay ID request was not approved. Please contact the barangay hall.",
+          instruction: "Please visit the barangay hall for assistance with your request.",
           color: "#ef4444",
         };
       default:
@@ -55,6 +57,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
           title: "Pending Review",
           subtitle:
             "Your Barangay ID request has been submitted and is pending staff review.",
+          instruction: "We will notify you once your request is processed. This may take 1-3 business days.",
           color: "#f59e0b",
         };
     }
@@ -74,6 +77,10 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
 
       <Text style={styles.subtitle}>{display.subtitle}</Text>
 
+      <View style={styles.instructionBox}>
+        <Text style={styles.instructionText}>{display.instruction}</Text>
+      </View>
+
       <View style={styles.idContainer}>
         <Text style={styles.idLabel}>Request ID</Text>
         <Text style={styles.idValue}>{requestId}</Text>
@@ -88,6 +95,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
         onPress={onDone}
         accessibilityLabel="Done - return to home"
         accessibilityRole="button"
+        accessibilityHint="Return to the welcome screen to start a new request"
       >
         <Text style={styles.doneButtonText}>Done</Text>
       </TouchableOpacity>
@@ -125,7 +133,21 @@ const styles = StyleSheet.create({
     color: "#666",
     textAlign: "center",
     lineHeight: 24,
+    marginBottom: 16,
+  },
+  instructionBox: {
+    backgroundColor: "#f0fdf4",
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 24,
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+  },
+  instructionText: {
+    fontSize: 16,
+    color: "#166534",
+    textAlign: "center",
+    lineHeight: 22,
   },
   idContainer: {
     backgroundColor: "#f5f5f5",

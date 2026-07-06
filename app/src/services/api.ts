@@ -1,10 +1,8 @@
 import axios from "axios";
 
-// ⚙️ CONFIG: Set your API base URL below
-// Android emulator: http://10.0.2.2:3000/api
-// iOS simulator:    http://localhost:3000/api
-// Physical device:  http://<YOUR_LAN_IP>:3000/api
-const API_BASE = "http://10.0.2.2:3000/api";
+// API base URL from environment variable
+// Falls back to Android emulator default if not set
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:3000/api";
 
 export interface OcrResult {
   fullName: string | null;

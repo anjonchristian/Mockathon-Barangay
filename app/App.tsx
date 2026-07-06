@@ -29,9 +29,14 @@ export default function App() {
 
   if (!isReady) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" }}>
-        <ActivityIndicator size="large" color="#000" />
-        <Text style={{ marginTop: 16, fontSize: 16 }}>Loading...</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#fff", padding: 32 }}>
+        <ActivityIndicator size="large" color="#22c55e" />
+        <Text style={{ marginTop: 24, fontSize: 18, fontWeight: "600", color: "#333", textAlign: "center" }}>
+          Getting Ready...
+        </Text>
+        <Text style={{ marginTop: 8, fontSize: 16, color: "#666", textAlign: "center" }}>
+          {error ? "Something went wrong. Please restart the app." : "Preparing e-Kap for you"}
+        </Text>
         <StatusBar style="auto" />
       </View>
     );
