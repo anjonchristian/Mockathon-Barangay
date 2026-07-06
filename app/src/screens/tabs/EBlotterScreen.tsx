@@ -1,7 +1,260 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import VoiceDictationButton from "../../components/VoiceDictationButton";
+
+type IncidentType =
+  | "noise_complaint"
+  | "property_dispute"
+  | "theft"
+  | "disturbance"
+  | "other";
+
+interface IncidentOption {
+  type: IncidentType;
+  title: string;
+  description: string;
+}
+
+const INCIDENT_TYPES: IncidentOption[] = [
+  { type: "noise_complaint", title: "Noise Complaint", description: "Excessive noise from neighbors" },
+  { type: "property_dispute", title: "Property Dispute", description: "Boundary or land issues" },
+  { type: "theft", title: "Theft/Lost Item", description: "Report stolen or lost items" },
+  { type: "disturbance", title: "Public Disturbance", description: "Disorderly conduct in public" },
+  { type: "other", title: "Other", description: "Other types of incidents" },
+];
+
+interface Report {
+  id: string;
+  title: string;
+  status: "under_review" | "mediation_scheduled" | "resolved" | "escalated";
+  date: string;
+  description: string;
+}
+
+const MOCK_REPORTS: Report[] = [
+  {
+    id: "1",
+    title: "Noise Complaint",
+    status: "under_review",
+    date: "Filed: Jan 15, 2026",
+    description: "Loud music from neighbor's house past 10 PM",
+  },
+  {
+    id: "2",
+    title: "Property Dispute",
+    status: "mediation_scheduled",
+    date: "Filed: Jan 10, 2026",
+    description: "Boundary fence issue with adjacent lot",
+  },
+  {
+    id: "3",
+    title: "Lost Item Report",
+    status: "resolved",
+    date: "Filed: Jan 5, 2026",
+    description: "Lost wallet near barangay hall",
+  },
+];
+
+const STATUS_LABELS: Record<Report["status"], string> = {
+  under_review: "Under Review",
+  mediation_scheduled: "Mediation Scheduled",
+  resolved: "Resolved",
+  escalated: "Escalated",
+};
+
+const STATUS_STYLES: Record<Report["status"], object> = {
+  under_review: { backgroundColor: "#FEF3C7" },
+  mediation_scheduled: { backgroundColor: "#DBEAFE" },
+  resolved: { backgroundColor: "#D1FAE5" },
+  escalated: { backgroundColor: "#FEE2E2" },
+};
 
 export default function EBlotterScreen() {
+  const [showForm, setShowForm] = useState(false);
+  const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
+  const [description, setDescription] = useState("");
+  const [location, setLocation] = useState("");
+  const [personInvolved, setPersonInvolved] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleFileReport = () => {
+    setShowForm(true);
+  };
+
+  const handleSelectType = (type: IncidentType) => {
+    setSelectedType(type);
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedType || !description.trim() || !location.trim()) {
+      Alert.alert("Missing Information", "Please select an incident type and fill in all required fields.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      Alert.alert(
+        "Report Filed",
+        "Your incident report has been submitted successfully. You will be notified of updates.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              setShowForm(false);
+              setSelectedType(null);
+              setDescription("");
+              setLocation("");
+              setPersonInvolved("");
+            },
+          },
+        ]
+      );
+    } catch {
+      Alert.alert("Error", "Failed to file report. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleBack = () => {
+    setShowForm(false);
+    setSelectedType(null);
+    setDescription("");
+    setLocation("");
+    setPersonInvolved("");
+  };
+
+  if (showForm) {
+    return (
+      <View style={styles.container}>
+        <ScrollView style={styles.content} keyboardShouldPersistTaps="handled">
+          <TouchableOpacity
+            onPress={handleBack}
+            style={styles.backButton}
+            accessibilityLabel="Go back to reports list"
+            accessibilityRole="button"
+          >
+            <Text style={styles.backButtonText}>{"< Back"}</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.title}>File Incident Report</Text>
+          <Text style={styles.subtitle}>
+            Use the microphone button to dictate your report.
+          </Text>
+
+          <Text style={styles.label}>Type of Incident</Text>
+          <View style={styles.typeList}>
+            {INCIDENT_TYPES.map((incident) => (
+              <TouchableOpacity
+                key={incident.type}
+                style={[
+                  styles.typeChip,
+                  selectedType === incident.type && styles.typeChipSelected,
+                ]}
+                onPress={() => handleSelectType(incident.type)}
+                accessibilityLabel={`Select ${incident.title}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected: selectedType === incident.type }}
+              >
+                <Text
+                  style={[
+                    styles.typeChipText,
+                    selectedType === incident.type && styles.typeChipTextSelected,
+                  ]}
+                >
+                  {incident.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Description of Incident</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={[styles.input, styles.textArea]}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Describe what happened..."
+                placeholderTextColor="#999"
+                multiline
+                numberOfLines={4}
+                accessibilityLabel="Incident description"
+              />
+              <VoiceDictationButton
+                onTextReceived={setDescription}
+                currentValue={description}
+                placeholder="Describe the incident"
+              />
+            </View>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Location</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                value={location}
+                onChangeText={setLocation}
+                placeholder="Where did it happen?"
+                placeholderTextColor="#999"
+                accessibilityLabel="Incident location"
+              />
+              <VoiceDictationButton
+                onTextReceived={setLocation}
+                currentValue={location}
+                placeholder="Say the location"
+              />
+            </View>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Person(s) Involved (Optional)</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                value={personInvolved}
+                onChangeText={setPersonInvolved}
+                placeholder="Names of persons involved"
+                placeholderTextColor="#999"
+                accessibilityLabel="Persons involved"
+              />
+              <VoiceDictationButton
+                onTextReceived={setPersonInvolved}
+                currentValue={personInvolved}
+                placeholder="Say the names"
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={submitting}
+            accessibilityLabel="Submit incident report"
+            accessibilityRole="button"
+          >
+            {submitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Submit Report</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.content}>
@@ -12,6 +265,7 @@ export default function EBlotterScreen() {
 
         <TouchableOpacity
           style={styles.newReportButton}
+          onPress={handleFileReport}
           accessibilityLabel="File new incident report"
           accessibilityRole="button"
         >
@@ -21,44 +275,18 @@ export default function EBlotterScreen() {
         <Text style={styles.sectionTitle}>Recent Reports</Text>
 
         <View style={styles.reportList}>
-          <View style={styles.reportCard}>
-            <View style={styles.reportHeader}>
-              <Text style={styles.reportTitle}>Noise Complaint</Text>
-              <View style={[styles.statusBadge, styles.statusPending]}>
-                <Text style={styles.statusText}>Under Review</Text>
+          {MOCK_REPORTS.map((report) => (
+            <View key={report.id} style={styles.reportCard}>
+              <View style={styles.reportHeader}>
+                <Text style={styles.reportTitle}>{report.title}</Text>
+                <View style={[styles.statusBadge, STATUS_STYLES[report.status]]}>
+                  <Text style={styles.statusText}>{STATUS_LABELS[report.status]}</Text>
+                </View>
               </View>
+              <Text style={styles.reportDate}>{report.date}</Text>
+              <Text style={styles.reportDescription}>{report.description}</Text>
             </View>
-            <Text style={styles.reportDate}>Filed: Jan 15, 2026</Text>
-            <Text style={styles.reportDescription}>
-              Loud music from neighbor's house past 10 PM
-            </Text>
-          </View>
-
-          <View style={styles.reportCard}>
-            <View style={styles.reportHeader}>
-              <Text style={styles.reportTitle}>Property Dispute</Text>
-              <View style={[styles.statusBadge, styles.statusScheduled]}>
-                <Text style={styles.statusText}>Mediation Scheduled</Text>
-              </View>
-            </View>
-            <Text style={styles.reportDate}>Filed: Jan 10, 2026</Text>
-            <Text style={styles.reportDescription}>
-              Boundary fence issue with adjacent lot
-            </Text>
-          </View>
-
-          <View style={styles.reportCard}>
-            <View style={styles.reportHeader}>
-              <Text style={styles.reportTitle}>Lost Item Report</Text>
-              <View style={[styles.statusBadge, styles.statusResolved]}>
-                <Text style={styles.statusText}>Resolved</Text>
-              </View>
-            </View>
-            <Text style={styles.reportDate}>Filed: Jan 5, 2026</Text>
-            <Text style={styles.reportDescription}>
-              Lost wallet near barangay hall
-            </Text>
-          </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -73,6 +301,16 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+  },
+  backButton: {
+    marginBottom: 16,
+    minHeight: 48,
+    justifyContent: "center",
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: "#000",
+    fontWeight: "600",
   },
   title: {
     fontSize: 32,
@@ -132,15 +370,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginLeft: 12,
   },
-  statusPending: {
-    backgroundColor: "#FEF3C7",
-  },
-  statusScheduled: {
-    backgroundColor: "#DBEAFE",
-  },
-  statusResolved: {
-    backgroundColor: "#D1FAE5",
-  },
   statusText: {
     fontSize: 12,
     fontWeight: "600",
@@ -154,5 +383,80 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     lineHeight: 20,
+  },
+  formGroup: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 8,
+  },
+  typeList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 20,
+  },
+  typeChip: {
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "transparent",
+    minHeight: 48,
+    justifyContent: "center",
+  },
+  typeChipSelected: {
+    backgroundColor: "#E6F4FE",
+    borderColor: "#000",
+  },
+  typeChipText: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "500",
+  },
+  typeChipTextSelected: {
+    color: "#000",
+    fontWeight: "700",
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: "#000",
+    minHeight: 52,
+  },
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  submitButton: {
+    backgroundColor: "#000",
+    borderRadius: 12,
+    paddingVertical: 18,
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 40,
+    minHeight: 56,
+    justifyContent: "center",
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
