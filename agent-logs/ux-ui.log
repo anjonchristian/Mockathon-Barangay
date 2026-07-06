@@ -1,18 +1,8 @@
-[2026-07-06 22:55:24] - INFO - SKILL_LOAD - Loaded skill: shadcn
-[2026-07-06 22:55:24] - INFO - SKILL_LOAD - Loaded skill: tailwind-design-system
-[2026-07-06 22:55:24] - INFO - SKILL_LOAD - Loaded skill: vercel-react-best-practices
-[2026-07-06 22:55:24] - INFO - VALIDATION - components.json: OK (style=base-nova, rsc=false, iconLibrary=lucide, aliases correct)
-[2026-07-06 22:55:24] - INFO - VALIDATION - index.css: OK (@import "tailwindcss", @theme inline, @custom-variant dark, @layer base)
-[2026-07-06 22:55:24] - INFO - VALIDATION - src/lib/utils.ts: OK (cn() utility using clsx + tailwind-merge)
-[2026-07-06 22:55:24] - INFO - VALIDATION - UI components: All 9 installed (badge, button, card, dialog, select, skeleton, sonner, table, textarea) import correctly
-[2026-07-06 22:55:24] - INFO - VALIDATION - TypeScript compiles: CLEAN (0 errors before and after changes)
-[2026-07-06 22:55:24] - INFO - REVIEW - App.tsx: Found space-y-3 usage (lines 14,17); raw colors (bg-gray-50, text-gray-900, border-gray-200, etc.); raw <button> in navbar; icons with w-4 h-4; error banner custom div
-[2026-07-06 22:55:24] - INFO - REVIEW - KanbanColumn.tsx: Found space-y-3 (line 40), space-y-1 (line 54); custom Badge color overrides (bg-yellow-100 etc.); icons with w-4 h-4; raw text colors
-[2026-07-06 22:55:24] - INFO - REVIEW - RequestDetailDialog.tsx: Found icons with w-4 h-4 mr-1 in buttons (should use data-icon); hardcoded bg-green-600 hover:bg-green-700 on Approve button; raw label color
-[2026-07-06 22:55:24] - INFO - REVIEW - MissedCallsPanel.tsx: Found space-y-2 (line 50); w-4 h-4/w-5 h-5 on icons; raw text colors
-[2026-07-06 22:55:24] - INFO - REVIEW - RequestCard.tsx: File does not exist — requests are rendered inline in KanbanColumn. Not a bug per se, but noted for design consistency.
-[2026-07-06 22:55:24] - INFO - FIX - App.tsx: Replaced space-y-3 with flex flex-col gap-3 in LoadingSkeleton; replaced raw colors with semantic tokens (bg-gray-50?bg-background, bg-white?bg-card, text-gray-900?text-foreground, border-gray-200?border-border, etc.); replaced raw <button> with <Button variant="link">; replaced w-4 h-4 with size-4; replaced error banner custom div with semantic destructive tokens
-[2026-07-06 22:55:24] - INFO - FIX - KanbanColumn.tsx: Replaced space-y-3 with flex flex-col gap-3; replaced space-y-1 with flex flex-col gap-1; replaced custom statusColors raw classes with Badge variants (secondary/default/destructive); replaced w-4 h-4 with size-4 on icons; replaced raw text colors with semantic tokens; added proper Record typing for statusVariants
-[2026-07-06 22:55:24] - INFO - FIX - RequestDetailDialog.tsx: Replaced w-4 h-4 mr-1 with data-icon="inline-start" on Button icons; replaced bg-green-600 hover:bg-green-700 with variant="default" on Approve button; replaced raw text colors with semantic tokens
-[2026-07-06 22:55:24] - INFO - FIX - MissedCallsPanel.tsx: Replaced space-y-2 with flex flex-col gap-2; replaced w-4 h-4/w-5 h-5 with size-4/size-5; replaced raw text colors with semantic tokens
-[2026-07-06 22:55:24] - INFO - VERIFICATION - npx tsc --noEmit: PASSED (0 errors)
+ï»¿[2026-07-07 00:20:20] - INFO - FEATURE - Created useSignaling hook for WebSocket SignalingClient integration
+[2026-07-07 00:20:20] - INFO - FEATURE - Replaced demo simulate call button with real WebSocket signaling
+[2026-07-07 00:20:20] - INFO - FEATURE - Created NewRecordDialog component (form with 8 fields + file upload)
+[2026-07-07 00:20:20] - INFO - FEATURE - Wired New Record button in SideNavBar to open dialog
+[2026-07-07 00:20:20] - INFO - FEATURE - Updated DashboardPage to show incoming call toast from WS events
+[2026-07-07 00:20:20] - INFO - FEATURE - Added WebSocket connection status indicator (disconnected toast)
+[2026-07-07 00:20:20] - INFO - FEATURE - IncomingCallToast accepts dynamic caller name/info props
+[2026-07-07 00:20:20] - INFO - BUILD - Production build: 430KB JS, 100KB CSS, 0 errors, 648ms

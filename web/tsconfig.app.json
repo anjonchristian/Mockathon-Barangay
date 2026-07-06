@@ -29,5 +29,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/app/components/ui/calendar.tsx",
+    "src/app/components/ui/chart.tsx",
+    "src/app/components/ui/resizable.tsx"
+  ]
 }

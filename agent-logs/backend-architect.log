@@ -1,0 +1,4 @@
+2026-07-06 23:50:28 - [INFO] - [API_SERVICE_LAYER] - Created web/src/lib/api.ts (543 lines)
+2026-07-06 23:50:28 - [INFO] - [API_SERVICE_LAYER] - Defined 7 endpoint functions + SignalingClient WebSocket class
+2026-07-06 23:50:28 - [INFO] - [API_SERVICE_LAYER] - Types match all 3 backend models: BarangayIDRequest, OcrResult, MissedCallLog
+2026-07-06 23:50:28 - [INFO] - [API_SERVICE_LAYER] - Error handling: extractErrorMessage + isSuccess type guard
