@@ -1,8 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
 import { KanbanColumn } from "./components/KanbanColumn";
 import { MissedCallsPanel } from "./components/MissedCallsPanel";
+import { Toaster } from "./components/ui/sonner";
+import { Skeleton } from "./components/ui/skeleton";
 import { fetchRequests, type BarangayIDRequest, updateRequestStatus } from "./lib/api";
 import { Loader2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+
+function LoadingSkeleton() {
+  return (
+    <div className="flex flex-col lg:flex-row gap-6">
+      {[1, 2, 3].map((col) => (
+        <div key={col} className="flex-1 min-w-0 space-y-3">
+          <Skeleton className="h-8 w-32" />
+          {[1, 2, 3].map((card) => (
+            <div key={card} className="rounded-lg border p-4 space-y-3">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function App() {
   const [requests, setRequests] = useState<BarangayIDRequest[]>([]);
@@ -16,15 +39,18 @@ function App() {
       const data = await fetchRequests();
       setRequests(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load requests");
+      const msg = err instanceof Error ? err.message : "Failed to load requests";
+      setError(msg);
+      if (!loading) {
+        toast.error("Connection error", { description: msg });
+      }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loading]);
 
   useEffect(() => {
     loadRequests();
-    // Poll every 5 seconds
     const interval = setInterval(loadRequests, 5000);
     return () => clearInterval(interval);
   }, [loadRequests]);
@@ -32,9 +58,12 @@ function App() {
   const handleStatusChange = async (id: string, status: "approved" | "rejected", notes?: string) => {
     try {
       await updateRequestStatus(id, status, notes);
-      await loadRequests(); // Immediate refresh
+      toast.success(status === "approved" ? "Request approved" : "Request rejected");
+      await loadRequests();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update status");
+      const msg = err instanceof Error ? err.message : "Failed to update status";
+      setError(msg);
+      toast.error("Update failed", { description: msg });
     }
   };
 
@@ -44,12 +73,13 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster />
       {/* Top navbar */}
       <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-gray-900">e-Kap Admin</h1>
           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-            {pendingRequests.length} pending
+            {loading ? "..." : `${pendingRequests.length} pending`}
           </span>
         </div>
         <button
@@ -63,7 +93,7 @@ function App() {
       {/* Error banner */}
       {error && (
         <div className="bg-red-50 border-b border-red-200 px-6 py-3 flex items-center gap-2 text-red-700 text-sm">
-          <AlertCircle className="w-4 h-4" />
+          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
           <button onClick={() => setError(null)} className="ml-auto font-medium hover:underline">
             Dismiss
@@ -81,9 +111,7 @@ function App() {
       {/* Main content */}
       <main className="p-6">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
-          </div>
+          <LoadingSkeleton />
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">
             <KanbanColumn
