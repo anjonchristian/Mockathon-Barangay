@@ -2,7 +2,7 @@ import axios from "axios";
 
 // API base URL from environment variable
 // Falls back to Android emulator default if not set
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:3000/api";
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || "http://192.168.1.30:3000/api";
 
 export interface OcrResult {
   fullName: string | null;
