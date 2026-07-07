@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import VoiceDictationButton from "../../components/VoiceDictationButton";
+import VerificationGate from "../../components/VerificationGate";
+import { useVerification } from "../../context/VerificationContext";
 
 type DocumentType =
   | "barangay_clearance"
@@ -51,7 +53,14 @@ const DOCUMENT_OPTIONS: DocumentOption[] = [
   },
 ];
 
-export default function DocumentsScreen() {
+interface DocumentsScreenProps {
+  onCompleteRegistration?: () => void;
+}
+
+export default function DocumentsScreen({
+  onCompleteRegistration,
+}: DocumentsScreenProps = {}) {
+  const { verificationStatus } = useVerification();
   const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -59,7 +68,15 @@ export default function DocumentsScreen() {
   const [purpose, setPurpose] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const handleCompleteRegistration = () => {
+    onCompleteRegistration?.();
+  };
+
   const handleSelectDocument = (type: DocumentType) => {
+    // Gate document requests for unverified users
+    if (verificationStatus !== "approved") {
+      return;
+    }
     setSelectedDoc(type);
     setShowForm(true);
   };
@@ -202,33 +219,38 @@ export default function DocumentsScreen() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.content}>
-        <Text style={styles.title}>Documents</Text>
-        <Text style={styles.subtitle}>
-          Request barangay documents and certificates
-        </Text>
+      <VerificationGate
+        featureName="document requests"
+        onCompleteRegistration={handleCompleteRegistration}
+      >
+        <ScrollView style={styles.content}>
+          <Text style={styles.title}>Documents</Text>
+          <Text style={styles.subtitle}>
+            Request barangay documents and certificates
+          </Text>
 
-        <View style={styles.documentList}>
-          {DOCUMENT_OPTIONS.map((doc) => (
-            <TouchableOpacity
-              key={doc.type}
-              style={styles.documentCard}
-              onPress={() => handleSelectDocument(doc.type)}
-              accessibilityLabel={`Request ${doc.title}`}
-              accessibilityRole="button"
-            >
-              <View style={styles.documentIcon}>
-                <Text style={styles.iconText}>{doc.icon}</Text>
-              </View>
-              <View style={styles.documentInfo}>
-                <Text style={styles.documentTitle}>{doc.title}</Text>
-                <Text style={styles.documentDescription}>{doc.description}</Text>
-              </View>
-              <Text style={styles.arrow}>{">"}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+          <View style={styles.documentList}>
+            {DOCUMENT_OPTIONS.map((doc) => (
+              <TouchableOpacity
+                key={doc.type}
+                style={styles.documentCard}
+                onPress={() => handleSelectDocument(doc.type)}
+                accessibilityLabel={`Request ${doc.title}`}
+                accessibilityRole="button"
+              >
+                <View style={styles.documentIcon}>
+                  <Text style={styles.iconText}>{doc.icon}</Text>
+                </View>
+                <View style={styles.documentInfo}>
+                  <Text style={styles.documentTitle}>{doc.title}</Text>
+                  <Text style={styles.documentDescription}>{doc.description}</Text>
+                </View>
+                <Text style={styles.arrow}>{">"}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </VerificationGate>
     </View>
   );
 }

@@ -15,6 +15,7 @@ import {
   sendChatMessage,
   checkStaffStatus,
 } from "../../services/webrtcService";
+import { useVerification } from "../../context/VerificationContext";
 import VideoCallScreen from "../VideoCallScreen";
 
 interface Message {
@@ -25,7 +26,14 @@ interface Message {
   suggestedActions?: string[];
 }
 
-export default function AIAssistantScreen() {
+interface AIAssistantScreenProps {
+  onCompleteRegistration?: () => void;
+}
+
+export default function AIAssistantScreen({
+  onCompleteRegistration,
+}: AIAssistantScreenProps = {}) {
+  const { verificationStatus } = useVerification();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -103,11 +111,26 @@ export default function AIAssistantScreen() {
 
   const handleSuggestedAction = useCallback((action: string) => {
     if (action === "Talk to Staff") {
+      // Gate WebRTC escalation for unverified users
+      if (verificationStatus !== "approved") {
+        Alert.alert(
+          "Registration Required",
+          "Complete registration to talk to a barangay staff member. The AI assistant is still available to help you.",
+          [
+            { text: "Maybe Later", style: "cancel" },
+            {
+              text: "Complete Registration",
+              onPress: () => onCompleteRegistration?.(),
+            },
+          ]
+        );
+        return;
+      }
       handleTalkToOfficial();
     } else {
       setInputText(action);
     }
-  }, []);
+  }, [verificationStatus, onCompleteRegistration]);
 
   const handleTalkToOfficial = useCallback(async () => {
     try {
@@ -298,19 +321,35 @@ export default function AIAssistantScreen() {
       <TouchableOpacity
         style={[
           styles.talkToOfficialButton,
-          !staffAvailable && styles.talkToOfficialButtonOffline,
+          verificationStatus !== "approved"
+            ? styles.talkToOfficialButtonLocked
+            : !staffAvailable && styles.talkToOfficialButtonOffline,
         ]}
-        onPress={handleTalkToOfficial}
-        accessibilityLabel="Talk to a barangay official"
+        onPress={
+          verificationStatus === "approved"
+            ? handleTalkToOfficial
+            : () => onCompleteRegistration?.()
+        }
+        accessibilityLabel={
+          verificationStatus === "approved"
+            ? "Talk to a barangay official"
+            : "Complete registration to talk to staff"
+        }
         accessibilityRole="button"
         accessibilityHint={
-          staffAvailable
-            ? "Start a video call with a staff member"
-            : "Request a callback from a staff member"
+          verificationStatus === "approved"
+            ? staffAvailable
+              ? "Start a video call with a staff member"
+              : "Request a callback from a staff member"
+            : "Complete registration to access this feature"
         }
       >
         <Text style={styles.talkToOfficialButtonText}>
-          {staffAvailable ? "📞 Talk to an Official" : "📞 Request Callback"}
+          {verificationStatus === "approved"
+            ? staffAvailable
+              ? "📞 Talk to an Official"
+              : "📞 Request Callback"
+            : "🔒 Complete Registration to talk to staff"}
         </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
@@ -482,6 +521,9 @@ const styles = StyleSheet.create({
   },
   talkToOfficialButtonOffline: {
     backgroundColor: "#6B7280",
+  },
+  talkToOfficialButtonLocked: {
+    backgroundColor: "#4B5563",
   },
   talkToOfficialButtonText: {
     color: "#fff",

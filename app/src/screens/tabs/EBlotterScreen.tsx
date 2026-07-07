@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import VoiceDictationButton from "../../components/VoiceDictationButton";
+import VerificationGate from "../../components/VerificationGate";
+import { useVerification } from "../../context/VerificationContext";
 
 type IncidentType =
   | "noise_complaint"
@@ -78,15 +80,32 @@ const STATUS_STYLES: Record<Report["status"], object> = {
   escalated: { backgroundColor: "#FEE2E2" },
 };
 
-export default function EBlotterScreen() {
+interface EBlotterScreenProps {
+  onCompleteRegistration?: () => void;
+}
+
+export default function EBlotterScreen({
+  onCompleteRegistration,
+}: EBlotterScreenProps = {}) {
+  const { verificationStatus } = useVerification();
   const [showForm, setShowForm] = useState(false);
+  const [showGate, setShowGate] = useState(false);
   const [selectedType, setSelectedType] = useState<IncidentType | null>(null);
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [personInvolved, setPersonInvolved] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  const handleCompleteRegistration = () => {
+    onCompleteRegistration?.();
+  };
+
   const handleFileReport = () => {
+    // Gate filing new reports for unverified users
+    if (verificationStatus !== "approved") {
+      setShowGate(true);
+      return;
+    }
     setShowForm(true);
   };
 
@@ -133,6 +152,52 @@ export default function EBlotterScreen() {
     setLocation("");
     setPersonInvolved("");
   };
+
+  const handleGateBack = () => {
+    setShowGate(false);
+  };
+
+  if (showGate) {
+    return (
+      <View style={styles.container}>
+        <VerificationGate
+          featureName="filing new reports"
+          onCompleteRegistration={handleCompleteRegistration}
+          limitedAccessContent={
+            <ScrollView style={styles.content}>
+              <TouchableOpacity
+                onPress={handleGateBack}
+                style={styles.backButton}
+                accessibilityLabel="Go back to reports list"
+                accessibilityRole="button"
+              >
+                <Text style={styles.backButtonText}>{"< Back"}</Text>
+              </TouchableOpacity>
+              <Text style={styles.title}>e-Blotter</Text>
+              <Text style={styles.subtitle}>
+                File incident reports and track status
+              </Text>
+              <Text style={styles.sectionTitle}>Recent Reports</Text>
+              <View style={styles.reportList}>
+                {MOCK_REPORTS.map((report) => (
+                  <View key={report.id} style={styles.reportCard}>
+                    <View style={styles.reportHeader}>
+                      <Text style={styles.reportTitle}>{report.title}</Text>
+                      <View style={[styles.statusBadge, STATUS_STYLES[report.status]]}>
+                        <Text style={styles.statusText}>{STATUS_LABELS[report.status]}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.reportDate}>{report.date}</Text>
+                    <Text style={styles.reportDescription}>{report.description}</Text>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          }
+        />
+      </View>
+    );
+  }
 
   if (showForm) {
     return (

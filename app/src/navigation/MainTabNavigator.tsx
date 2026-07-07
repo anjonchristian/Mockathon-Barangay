@@ -8,6 +8,11 @@ import ProfileScreen from "../screens/tabs/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 
+interface MainTabNavigatorProps {
+  /** Called when a guest user wants to start registration from the Profile tab. */
+  onCompleteRegistration: () => void;
+}
+
 function TabBarIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: { [key: string]: string } = {
     Documents: "📄",
@@ -23,7 +28,9 @@ function TabBarIcon({ name, focused }: { name: string; focused: boolean }) {
   );
 }
 
-export default function MainTabNavigator() {
+export default function MainTabNavigator({
+  onCompleteRegistration,
+}: MainTabNavigatorProps) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -50,7 +57,9 @@ export default function MainTabNavigator() {
       <Tab.Screen name="Documents" component={DocumentsScreen} />
       <Tab.Screen name="e-Blotter" component={EBlotterScreen} />
       <Tab.Screen name="AI Assistant" component={AIAssistantScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile">
+        {() => <ProfileScreen onCompleteRegistration={onCompleteRegistration} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }

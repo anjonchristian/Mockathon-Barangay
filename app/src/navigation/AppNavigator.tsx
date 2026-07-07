@@ -7,6 +7,7 @@ import MainTabNavigator from "./MainTabNavigator";
 import CaptureScreen from "../screens/CaptureScreen";
 import ReviewScreen from "../screens/ReviewScreen";
 import StatusScreen from "../screens/StatusScreen";
+import { VerificationProvider } from "../context/VerificationContext";
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -31,6 +32,7 @@ function WelcomeScreenWrapper({ navigation }: WelcomeScreenProps) {
   return (
     <WelcomeScreen
       onGetStarted={() => navigation.navigate("Registration")}
+      onSkip={() => navigation.replace("MainTabs")}
     />
   );
 }
@@ -78,12 +80,17 @@ function StatusScreenWrapper({ route, navigation }: StatusScreenProps) {
 }
 
 function MainTabsWrapper({ navigation }: MainTabsProps) {
-  return <MainTabNavigator />;
+  return (
+    <MainTabNavigator
+      onCompleteRegistration={() => navigation.navigate("Registration")}
+    />
+  );
 }
 
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
+    <VerificationProvider>
+      <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Welcome"
         screenOptions={{
@@ -144,5 +151,6 @@ export default function AppNavigator() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </VerificationProvider>
   );
 }

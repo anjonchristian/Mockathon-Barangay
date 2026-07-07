@@ -2,9 +2,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 interface WelcomeScreenProps {
   onGetStarted: () => void;
+  onSkip: () => void;
 }
 
-export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onGetStarted, onSkip }: WelcomeScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -50,6 +51,16 @@ export default function WelcomeScreen({ onGetStarted }: WelcomeScreenProps) {
         accessibilityHint="Navigates to the registration screen to complete your profile"
       >
         <Text style={styles.buttonText}>Get Started</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.skipButton}
+        onPress={onSkip}
+        accessibilityLabel="Skip for now and continue as guest"
+        accessibilityRole="button"
+        accessibilityHint="Skips registration and takes you to the app as a guest. You can complete registration later from your profile."
+      >
+        <Text style={styles.skipButtonText}>Skip for Now</Text>
       </TouchableOpacity>
     </View>
   );
@@ -135,5 +146,21 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "600",
+  },
+  skipButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    minHeight: 48,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  skipButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
