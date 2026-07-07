@@ -50,7 +50,16 @@ router.get("/", async (req: Request, res: Response) => {
     const { status, page = "1", limit = "20" } = req.query;
     const filter: Record<string, unknown> = {};
 
-    if (status && ["pending_review", "approved", "rejected"].includes(status as string)) {
+    if (
+      status &&
+      [
+        "pending_review",
+        "processing",
+        "approved",
+        "completed",
+        "rejected",
+      ].includes(status as string)
+    ) {
       filter.status = status;
     }
 
@@ -97,13 +106,28 @@ router.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-// PATCH /api/requests/:id — Update request status (approve/reject)
+// PATCH /api/requests/:id — Update request status
+// Valid transitions:
+//   pending_review → processing | rejected   (approve / reject)
+//   processing     → approved | rejected      (mark ready for pickup / reject)
+//   approved       → completed                (mark completed / claimed)
+//   completed      → (read-only)
 router.patch("/:id", async (req: Request, res: Response) => {
   try {
     const { status, staffNotes } = req.body;
 
-    if (!status || !["approved", "rejected"].includes(status)) {
-      res.status(400).json({ success: false, error: "Invalid status. Must be 'approved' or 'rejected'" });
+    const validStatuses = [
+      "processing",
+      "approved",
+      "completed",
+      "rejected",
+    ];
+    if (!status || !validStatuses.includes(status)) {
+      res.status(400).json({
+        success: false,
+        error:
+          "Invalid status. Must be 'processing', 'approved', 'completed', or 'rejected'",
+      });
       return;
     }
 

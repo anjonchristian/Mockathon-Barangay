@@ -4,7 +4,14 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import axios, { type AxiosError, type AxiosInstance } from "axios";
-import type { Registration, VerificationStatus } from "@/types";
+import type {
+  Registration,
+  VerificationStatus,
+  Blotter,
+  BlotterStatus,
+  Staff,
+  StaffRole,
+} from "@/types";
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -14,7 +21,12 @@ const WS_URL = import.meta.env.VITE_WS_URL ?? "ws://localhost:3001";
 // ─── Types: Match Backend Models Exactly ──────────────────────────────────────
 
 /** Possible statuses for a Barangay ID request */
-export type RequestStatus = "pending_review" | "approved" | "rejected";
+export type RequestStatus =
+  | "pending_review"
+  | "processing"
+  | "approved"
+  | "completed"
+  | "rejected";
 
 /** Gender enum as stored in the backend */
 export type Gender = "Male" | "Female" | "Other";
@@ -60,10 +72,17 @@ export interface CreateRequestPayload {
 }
 
 /**
- * Payload for approving or rejecting a request (PATCH).
+ * Payload for updating a request status (PATCH).
+ * Valid transitions:
+ *   pending_review → processing | rejected   (approve / reject)
+ *   processing     → approved | rejected      (mark ready / reject)
+ *   approved       → completed                (mark completed)
  */
 export interface UpdateRequestPayload {
-  status: Extract<RequestStatus, "approved" | "rejected">;
+  status: Extract<
+    RequestStatus,
+    "processing" | "approved" | "completed" | "rejected"
+  >;
   staffNotes?: string;
 }
 
@@ -492,6 +511,263 @@ export async function verifyRegistration(
     throw new Error(data.error);
   }
 
+  return data.data;
+}
+
+// ─── Blotter Reports ──────────────────────────────────────────────────────────
+
+/**
+ * Paginated list response shape returned by GET /api/blotter.
+ */
+export interface BlotterListResponse {
+  data: Blotter[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * Payload for PATCH /api/blotter/:id — all fields optional.
+ */
+export interface UpdateBlotterPayload {
+  status?: BlotterStatus;
+  mediationDate?: string | null;
+  mediationNotes?: string;
+  staffNotes?: string;
+  resolutionNotes?: string;
+}
+
+/**
+ * GET /api/blotter
+ *
+ * List blotter reports with optional status filter and pagination.
+ *
+ * @param params.status - Filter by status (omit for all).
+ * @param params.page   - Page number (default 1).
+ * @param params.limit  - Items per page (default 20).
+ */
+export async function listBlotters(params?: {
+  status?: BlotterStatus;
+  page?: number;
+  limit?: number;
+}): Promise<BlotterListResponse> {
+  const query: Record<string, string> = {};
+
+  if (params?.status) query.status = params.status;
+  if (params?.page) query.page = String(params.page);
+  if (params?.limit) query.limit = String(params.limit);
+
+  const { data } = await api.get<BlotterListResponse>("/blotter", {
+    params: query,
+  });
+
+  return data;
+}
+
+/**
+ * GET /api/blotter/:id
+ *
+ * Fetch a single blotter report by its MongoDB ObjectId.
+ *
+ * @throws {Error} If the blotter is not found (404) or server error.
+ */
+export async function getBlotter(id: string): Promise<Blotter> {
+  const { data } = await api.get<ApiResponse<Blotter>>(`/blotter/${id}`);
+
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+/**
+ * PATCH /api/blotter/:id
+ *
+ * Update a blotter report — status, mediation details, or staff notes.
+ * All fields are optional; only provided fields are updated.
+ *
+ * @throws {Error} If the blotter is not found or server error.
+ *
+ * @example
+ * // Change status
+ * await updateBlotter("abc123", { status: "resolved" });
+ *
+ * // Schedule mediation
+ * await updateBlotter("abc123", {
+ *   status: "scheduled_mediation",
+ *   mediationDate: "2025-01-15T09:00:00.000Z",
+ *   mediationNotes: "Both parties requested to attend."
+ * });
+ */
+export async function updateBlotter(
+  id: string,
+  payload: UpdateBlotterPayload
+): Promise<Blotter> {
+  const { data } = await api.patch<ApiResponse<Blotter>>(
+    `/blotter/${id}`,
+    payload
+  );
+
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+/**
+ * DELETE /api/blotter/:id
+ *
+ * Delete a blotter report permanently.
+ *
+ * @throws {Error} If the blotter is not found or server error.
+ */
+export async function deleteBlotter(id: string): Promise<void> {
+  await api.delete<ApiResponse<null>>(`/blotter/${id}`);
+}
+
+// ─── Staff Management ─────────────────────────────────────────────────────────
+
+/** Payload for creating a new staff member */
+export interface CreateStaffPayload {
+  firebaseUid?: string;
+  email: string;
+  fullName: string;
+  role?: StaffRole;
+  position?: string;
+  barangayCode?: string;
+  barangayName?: string;
+  cityMunicipalityCode?: string;
+  cityMunicipalityName?: string;
+  isActive?: boolean;
+  phoneNumber?: string;
+}
+
+/** Payload for updating a staff member (all fields optional) */
+export interface UpdateStaffPayload {
+  firebaseUid?: string;
+  email?: string;
+  fullName?: string;
+  role?: StaffRole;
+  position?: string;
+  barangayCode?: string;
+  barangayName?: string;
+  cityMunicipalityCode?: string;
+  cityMunicipalityName?: string;
+  isActive?: boolean;
+  phoneNumber?: string;
+}
+
+/**
+ * GET /api/staff
+ *
+ * List all staff members. Pass `isActive` to filter by active/inactive.
+ */
+export async function listStaff(params?: {
+  isActive?: boolean;
+}): Promise<Staff[]> {
+  const query: Record<string, string> = {};
+  if (params?.isActive !== undefined) {
+    query.isActive = String(params.isActive);
+  }
+  const { data } = await api.get<ApiResponse<Staff[]>>("/staff", {
+    params: query,
+  });
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+  return data.data;
+}
+
+/**
+ * GET /api/staff/:id
+ *
+ * Fetch a single staff member by MongoDB ObjectId.
+ */
+export async function getStaff(id: string): Promise<Staff> {
+  const { data } = await api.get<ApiResponse<Staff>>(`/staff/${id}`);
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+  return data.data;
+}
+
+/**
+ * POST /api/staff
+ *
+ * Create a new staff member.
+ */
+export async function createStaff(
+  payload: CreateStaffPayload
+): Promise<Staff> {
+  const { data } = await api.post<ApiResponse<Staff>>("/staff", payload);
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+  return data.data;
+}
+
+/**
+ * PATCH /api/staff/:id
+ *
+ * Update a staff member (role, position, isActive, etc.).
+ */
+export async function updateStaff(
+  id: string,
+  payload: UpdateStaffPayload
+): Promise<Staff> {
+  const { data } = await api.patch<ApiResponse<Staff>>(
+    `/staff/${id}`,
+    payload
+  );
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+  return data.data;
+}
+
+/**
+ * DELETE /api/staff/:id
+ *
+ * Delete a staff member permanently.
+ */
+export async function deleteStaff(id: string): Promise<void> {
+  await api.delete<ApiResponse<null>>(`/staff/${id}`);
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+/**
+ * Overview payload returned by GET /api/analytics/overview.
+ */
+export interface AnalyticsOverview {
+  registrations: Record<string, number>;
+  requests: Record<string, number>;
+  blotters: Record<string, number>;
+  totalMissedCalls: number;
+  avgProcessingTimeHours: number | null;
+  daily: Array<{
+    date: string;
+    registrations: number;
+    requests: number;
+    blotters: number;
+  }>;
+}
+
+/**
+ * GET /api/analytics/overview
+ *
+ * Aggregated counts across registrations, document requests, blotter
+ * reports, missed calls, plus daily totals for the last 7 days.
+ */
+export async function getAnalyticsOverview(): Promise<AnalyticsOverview> {
+  const { data } = await api.get<ApiResponse<AnalyticsOverview>>(
+    "/analytics/overview"
+  );
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
   return data.data;
 }
 

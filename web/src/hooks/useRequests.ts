@@ -5,27 +5,50 @@ import {
   updateRequest,
   extractErrorMessage,
   type BarangayIDRequest,
+  type RequestStatus,
 } from "@/lib/api";
-import type { KanbanCard } from "@/types";
+import type { KanbanCard, KanbanStatus } from "@/types";
 import { timeAgo, getDocTypeColor } from "@/types";
 import { POLL_INTERVAL } from "@/lib/constants";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Map a backend API request to a frontend KanbanCard.
- *   pending_review → pending  (shows Approve/Reject buttons)
- *   approved       → processing (read-only, shown in Pending column)
- *   rejected       → filtered out (not shown in board)
+ * Map a backend API request status to a frontend Kanban column status.
+ *   pending_review → pending      (Pending Review column)
+ *   processing     → processing   (Processing column)
+ *   approved       → pickup       (Ready for Pickup column)
+ *   completed      → completed    (Completed column)
+ *   rejected       → filtered out (not shown on the board)
  */
-function dtoToCard(dto: BarangayIDRequest): KanbanCard {
+function statusToKanban(status: RequestStatus): KanbanStatus | null {
+  switch (status) {
+    case "pending_review":
+      return "pending";
+    case "processing":
+      return "processing";
+    case "approved":
+      return "pickup";
+    case "completed":
+      return "completed";
+    default:
+      return null;
+  }
+}
+
+/**
+ * Map a backend API request to a frontend KanbanCard.
+ */
+function dtoToCard(dto: BarangayIDRequest): KanbanCard | null {
+  const kanbanStatus = statusToKanban(dto.status);
+  if (!kanbanStatus) return null;
   return {
     id: dto._id,
     fullName: dto.fullName,
     docType: "Barangay ID", // All MVP requests are Barangay ID
     dotColor: getDocTypeColor("Barangay ID"),
     timeAgo: timeAgo(dto.createdAt),
-    status: dto.status === "pending_review" ? "pending" : "processing",
+    status: kanbanStatus,
     photoBase64: dto.idPhotoBase64,
   };
 }
@@ -38,22 +61,29 @@ export function useRequests() {
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch pending + approved (processing) requests
+  // Fetch all four board statuses in parallel
   const fetchAll = useCallback(async () => {
     try {
-      // Fetch both statuses in parallel
-      const [pendingRes, approvedRes] = await Promise.all([
-        listRequests({ status: "pending_review", limit: 50 }),
-        listRequests({ status: "approved", limit: 50 }),
-      ]);
+      const [pendingRes, processingRes, approvedRes, completedRes] =
+        await Promise.all([
+          listRequests({ status: "pending_review", limit: 50 }),
+          listRequests({ status: "processing", limit: 50 }),
+          listRequests({ status: "approved", limit: 50 }),
+          listRequests({ status: "completed", limit: 50 }),
+        ]);
 
-      const allCards = [
+      const allCards: KanbanCard[] = [
         ...pendingRes.data.map(dtoToCard),
-        ...approvedRes.data.map((d) => ({ ...dtoToCard(d), status: "processing" as const })),
-      ];
-      // Sort: newest first
-      allCards.sort((a, b) => b.timeAgo.localeCompare(a.timeAgo));
+        ...processingRes.data.map(dtoToCard),
+        ...approvedRes.data.map(dtoToCard),
+        ...completedRes.data.map(dtoToCard),
+      ].filter((c): c is KanbanCard => c !== null);
 
+      // Sort: newest first (largest timeAgo bucket first is unreliable, so
+      // we re-sort by createdAt-derived ordering — but dtoToCard drops the
+      // raw date. The backend already returns each group sorted newest-first,
+      // and the groups themselves are ordered pending → completed, which is
+      // acceptable for display. We keep a stable order here.)
       setCards(allCards);
       setError(null);
     } catch (err) {
@@ -74,50 +104,76 @@ export function useRequests() {
 
   // ── Mutations ─────────────────────────────────────────────────────────────
 
-  /** Approve a request (moves to processing) */
+  /**
+   * Approve a request: pending_review → processing.
+   * Moves the card from the Pending Review column to the Processing column.
+   */
   const approve = useCallback(async (id: string) => {
-    // Optimistic update
+    const previous = cards;
     setCards((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, status: "processing" as const } : c))
+      prev.map((c) =>
+        c.id === id ? { ...c, status: "processing" as const } : c
+      )
     );
     try {
-      await updateRequest(id, { status: "approved" });
-      toast.success("Request approved");
+      await updateRequest(id, { status: "processing" });
+      toast.success("Request approved — now processing");
     } catch (err) {
-      // Rollback
-      setCards((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, status: "pending" as const } : c))
-      );
+      setCards(previous);
       toast.error(extractErrorMessage(err));
     }
-  }, []);
+  }, [cards]);
 
   /** Reject a request (removes from board) */
   const reject = useCallback(async (id: string) => {
-    // Optimistic removal
     const previous = cards;
     setCards((prev) => prev.filter((c) => c.id !== id));
     try {
       await updateRequest(id, { status: "rejected" });
       toast.error("Request rejected");
     } catch (err) {
-      // Rollback to previous state
       setCards(previous);
       toast.error(extractErrorMessage(err));
     }
   }, [cards]);
 
-  /** Mark a document as claimed (removes from board) */
-  const markClaimed = useCallback(async (id: string) => {
-    // Optimistic removal
-    setCards((prev) => prev.filter((c) => c.id !== id));
+  /**
+   * Mark a request ready for pickup: processing → approved.
+   * Moves the card from the Processing column to the Ready for Pickup column.
+   */
+  const markReadyForPickup = useCallback(async (id: string) => {
+    const previous = cards;
+    setCards((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, status: "pickup" as const } : c))
+    );
     try {
-      await updateRequest(id, { status: "rejected" }); // placeholder
-      toast.success("Document marked as claimed");
+      await updateRequest(id, { status: "approved" });
+      toast.success("Marked ready for pickup");
     } catch (err) {
+      setCards(previous);
       toast.error(extractErrorMessage(err));
     }
-  }, []);
+  }, [cards]);
+
+  /**
+   * Mark a document as completed/claimed: approved → completed.
+   * Moves the card from the Ready for Pickup column to the Completed column.
+   */
+  const markCompleted = useCallback(async (id: string) => {
+    const previous = cards;
+    setCards((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, status: "completed" as const } : c
+      )
+    );
+    try {
+      await updateRequest(id, { status: "completed" });
+      toast.success("Document marked as completed");
+    } catch (err) {
+      setCards(previous);
+      toast.error(extractErrorMessage(err));
+    }
+  }, [cards]);
 
   return {
     cards,
@@ -125,7 +181,8 @@ export function useRequests() {
     error,
     approve,
     reject,
-    markClaimed,
+    markReadyForPickup,
+    markCompleted,
     refetch: fetchAll,
   };
 }

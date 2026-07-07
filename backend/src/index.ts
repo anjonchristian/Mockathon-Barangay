@@ -8,7 +8,10 @@ import requestsRouter from "./routes/requests.js";
 import watchdogRouter from "./routes/watchdog.js";
 import registrationRouter from "./routes/registration.js";
 import chatRouter from "./routes/chat.js";
+import blotterRouter from "./routes/blotter.js";
 import webrtcRouter from "./routes/webrtc.js";
+import staffRouter from "./routes/staff.js";
+import analyticsRouter from "./routes/analytics.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3000", 10);
@@ -30,7 +33,10 @@ app.use("/api/requests", requestsRouter);
 app.use("/api/watchdog", watchdogRouter);
 app.use("/api/registration", registrationRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/blotter", blotterRouter);
 app.use("/api/webrtc", webrtcRouter);
+app.use("/api/staff", staffRouter);
+app.use("/api/analytics", analyticsRouter);
 
 // Start server
 async function start() {

@@ -17,7 +17,12 @@ export interface IBarangayIDRequest extends Document {
   cityMunicipalityName?: string;
   barangayCode?: string;
   barangayName?: string;
-  status: "pending_review" | "approved" | "rejected";
+  status:
+    | "pending_review"
+    | "processing"
+    | "approved"
+    | "completed"
+    | "rejected";
   staffNotes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -43,7 +48,13 @@ const BarangayIDRequestSchema = new Schema<IBarangayIDRequest>(
     barangayName: { type: String },
     status: {
       type: String,
-      enum: ["pending_review", "approved", "rejected"],
+      enum: [
+        "pending_review",
+        "processing",
+        "approved",
+        "completed",
+        "rejected",
+      ],
       default: "pending_review",
       index: true,
     },

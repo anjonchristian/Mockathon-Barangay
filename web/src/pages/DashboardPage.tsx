@@ -110,46 +110,55 @@ function PendingCard({
 
 // ─── Processing card ──────────────────────────────────────────────────────────
 
-function ProcessingCard({ card }: { card: KanbanCard }) {
+function ProcessingCard({
+  card,
+  onMarkReady,
+  onReject,
+}: {
+  card: KanbanCard;
+  onMarkReady: (id: string) => void;
+  onReject: (id: string) => void;
+}) {
   const nameParts = card.fullName.split(" ");
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ") || "";
 
   return (
     <div
-      className="bg-[#dce1ff] opacity-80 relative rounded-sm shrink-0 w-full"
+      className="bg-[#dce1ff] relative rounded-sm shrink-0 w-full"
       style={{ border: "1px solid #b6c4ff" }}
     >
-      <div className="overflow-clip rounded-[inherit] size-full">
-        <div className="flex flex-col items-start p-[17px] relative size-full">
-          <div className="absolute bg-[rgba(0,37,118,0.05)] inset-px" />
-          <div className="h-[79.59px] relative w-full">
-            <div className="absolute flex gap-4 items-center left-0 top-0">
-              <PhotoThumb photoBase64={card.photoBase64} />
-              <div className="flex flex-col items-start">
-                <div className="font-semibold text-[18px] text-[#0b1c30]">
-                  {lastName ? (
-                    <>
-                      <p className="mb-0 leading-[27px]">{firstName}</p>
-                      <p className="leading-[27px]">{lastName}</p>
-                    </>
-                  ) : (
-                    <p className="leading-[27px]">{card.fullName}</p>
-                  )}
-                </div>
-                <div className="h-[25.59px] flex items-center gap-3">
-                  <div
-                    className="rounded-[12px] size-2 shrink-0"
-                    style={{ backgroundColor: card.dotColor }}
-                  />
-                  <span className="font-normal text-[16px] leading-[25.6px] text-[#444653] whitespace-nowrap">
-                    {card.docType}
-                  </span>
-                </div>
+      <div className="flex flex-col gap-4 items-start p-[17px] size-full">
+        <div className="relative w-full flex items-start justify-between">
+          <div className="flex gap-4 items-center shrink-0">
+            <PhotoThumb photoBase64={card.photoBase64} />
+            <div className="flex flex-col items-start">
+              <div className="font-semibold text-[18px] text-[#0b1c30]">
+                {lastName ? (
+                  <>
+                    <p className="mb-0 leading-[27px]">{firstName}</p>
+                    <p className="leading-[27px]">{lastName}</p>
+                  </>
+                ) : (
+                  <p className="leading-[27px]">{card.fullName}</p>
+                )}
+              </div>
+              <div className="h-[25.59px] flex items-center gap-3">
+                <div
+                  className="rounded-[12px] size-2 shrink-0"
+                  style={{ backgroundColor: card.dotColor }}
+                />
+                <span className="font-normal text-[16px] leading-[25.6px] text-[#444653] whitespace-nowrap">
+                  {card.docType}
+                </span>
               </div>
             </div>
-
-            <div className="absolute flex gap-1 items-center" style={{ left: "152.97px", top: "-0.5px" }}>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="font-medium text-[14px] leading-[19.6px] text-[#747685] whitespace-nowrap text-right" style={{ letterSpacing: "0.14px" }}>
+              {card.timeAgo}
+            </span>
+            <div className="flex gap-1 items-center">
               <SvgIcon
                 name="p35cda880"
                 vb="0 0 10.6667 14.6667"
@@ -163,6 +172,26 @@ function ProcessingCard({ card }: { card: KanbanCard }) {
             </div>
           </div>
         </div>
+
+        <div className="flex gap-2 items-start w-full">
+          <button
+            onClick={() => onReject(card.id)}
+            className="bg-white flex flex-col h-12 items-center justify-center py-px flex-1 rounded-sm hover:bg-gray-50 transition-colors"
+            style={{ border: "1px solid #e2e8f0" }}
+          >
+            <span className="font-medium text-[16px] leading-6 text-[#0b1c30] text-center whitespace-nowrap">
+              Reject
+            </span>
+          </button>
+          <button
+            onClick={() => onMarkReady(card.id)}
+            className="bg-[#002576] flex flex-col h-12 items-center justify-center flex-1 rounded-sm hover:opacity-90 transition-opacity"
+          >
+            <span className="font-medium text-[16px] leading-6 text-white text-center whitespace-nowrap">
+              Mark Ready
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -172,10 +201,10 @@ function ProcessingCard({ card }: { card: KanbanCard }) {
 
 function PickupCard({
   card,
-  onClaim,
+  onMarkCompleted,
 }: {
   card: KanbanCard;
-  onClaim: (id: string) => void;
+  onMarkCompleted: (id: string) => void;
 }) {
   const nameParts = card.fullName.split(" ");
   const firstName = nameParts[0] ?? "";
@@ -223,15 +252,72 @@ function PickupCard({
         </div>
 
         <button
-          onClick={() => onClaim(card.id)}
+          onClick={() => onMarkCompleted(card.id)}
           className="bg-white h-12 w-full rounded-sm flex gap-2 items-center justify-center px-px hover:bg-gray-50 transition-colors"
           style={{ border: "1px solid #e2e8f0" }}
         >
           <SvgIcon name="p2f7dfa00" vb="0 0 16.3 12.025" w={16.3} h={12.025} fill="#0B1C30" />
           <span className="font-medium text-[16px] leading-6 text-[#0b1c30] text-center whitespace-nowrap">
-            Mark Claimed
+            Mark Completed
           </span>
         </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Completed card ───────────────────────────────────────────────────────────
+
+function CompletedCard({ card }: { card: KanbanCard }) {
+  const nameParts = card.fullName.split(" ");
+  const firstName = nameParts[0] ?? "";
+  const lastName = nameParts.slice(1).join(" ") || "";
+
+  return (
+    <div
+      className="bg-[#f0fdf4] relative rounded-sm shrink-0 w-full"
+      style={{ border: "1px solid #bbf7d0" }}
+    >
+      <div className="flex flex-col gap-2 items-start p-[17px] size-full">
+        <div className="relative w-full flex items-start justify-between">
+          <div className="flex gap-4 items-center shrink-0">
+            <div
+              className="bg-[#f1f5f9] relative rounded-sm shrink-0 size-12 flex items-center justify-center"
+              style={{ border: "1px solid #e2e8f0" }}
+            >
+              <SvgIcon name="pc679c40" vb="0 0 16 20" w={16} h={20} fill="#16a34a" />
+            </div>
+            <div className="flex flex-col items-start">
+              <div className="font-semibold text-[18px] text-[#0b1c30]">
+                {lastName ? (
+                  <>
+                    <p className="mb-0 leading-[27px]">{firstName}</p>
+                    <p className="leading-[27px]">{lastName}</p>
+                  </>
+                ) : (
+                  <p className="leading-[27px]">{card.fullName}</p>
+                )}
+              </div>
+              <div className="h-[25.59px] flex items-center gap-3">
+                <div
+                  className="rounded-[12px] size-2 shrink-0"
+                  style={{ backgroundColor: card.dotColor }}
+                />
+                <span className="font-normal text-[16px] leading-[25.6px] text-[#444653] whitespace-nowrap">
+                  {card.docType}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            <span className="font-medium text-[14px] leading-[19.6px] text-[#747685] whitespace-nowrap text-right" style={{ letterSpacing: "0.14px" }}>
+              {card.timeAgo}
+            </span>
+            <span className="font-medium text-[14px] leading-[19.6px] text-[#16a34a] whitespace-nowrap" style={{ letterSpacing: "0.14px" }}>
+              Completed
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -455,7 +541,8 @@ export default function DashboardPage() {
     error,
     approve,
     reject,
-    markClaimed,
+    markReadyForPickup,
+    markCompleted,
   } = useRequests();
 
   const {
@@ -483,7 +570,7 @@ export default function DashboardPage() {
   const pending = filteredCards.filter((c) => c.status === "pending");
   const processing = filteredCards.filter((c) => c.status === "processing");
   const pickup = filteredCards.filter((c) => c.status === "pickup");
-  const pendingCount = pending.length + processing.length;
+  const completed = filteredCards.filter((c) => c.status === "completed");
 
   const handleBatchApprove = useCallback(async () => {
     const ids = Array.from(selectedIds);
@@ -530,10 +617,10 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* 3-column grid */}
-      <div className="gap-x-6 gap-y-6 grid grid-cols-3 w-full items-start">
-        {/* Kanban board (col 1–2) */}
-        <div className="col-span-2 flex flex-col gap-4 items-start">
+      {/* 4-column grid: Kanban spans 3, Urgencies spans 1 */}
+      <div className="gap-x-6 gap-y-6 grid grid-cols-4 w-full items-start">
+        {/* Kanban board (col 1–3) */}
+        <div className="col-span-3 flex flex-col gap-4 items-start">
           {/* Heading + search + batch actions */}
           <div className="flex flex-col gap-2 items-start pb-2 w-full shrink-0">
             <div className="flex items-center justify-between w-full">
@@ -589,7 +676,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Kanban columns */}
-          <div className="flex gap-4 items-start w-full">
+          <div className="flex gap-3 items-start w-full">
             {/* Pending Review */}
             <div
               className="bg-[#eff4ff] flex-1 min-w-0 relative rounded-[4px]"
@@ -598,8 +685,8 @@ export default function DashboardPage() {
               <div className="flex flex-col gap-2 items-start p-[9px] w-full">
                 <div className="relative w-full shrink-0">
                   <div className="flex flex-col items-start px-2 py-1">
-                    <p className="font-medium text-[16px] leading-6 text-[#444653] uppercase w-full">
-                      PENDING REVIEW ({pendingCount})
+                    <p className="font-medium text-[14px] leading-6 text-[#444653] uppercase w-full">
+                      PENDING REVIEW ({pending.length})
                     </p>
                   </div>
                 </div>
@@ -611,12 +698,38 @@ export default function DashboardPage() {
                     onReject={reject}
                   />
                 ))}
-                {processing.map((card) => (
-                  <ProcessingCard key={card.id} card={card} />
-                ))}
-                {pendingCount === 0 && (
-                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[14px]">
+                {pending.length === 0 && (
+                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[13px]">
                     No pending requests
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Processing */}
+            <div
+              className="bg-[#eff4ff] flex-1 min-w-0 relative rounded-[4px]"
+              style={{ border: "1px solid #c4c5d5" }}
+            >
+              <div className="flex flex-col gap-2 items-start p-[9px] w-full">
+                <div className="relative w-full shrink-0">
+                  <div className="flex flex-col items-start px-2 py-1">
+                    <p className="font-medium text-[14px] leading-6 text-[#444653] uppercase w-full">
+                      PROCESSING ({processing.length})
+                    </p>
+                  </div>
+                </div>
+                {processing.map((card) => (
+                  <ProcessingCard
+                    key={card.id}
+                    card={card}
+                    onMarkReady={markReadyForPickup}
+                    onReject={reject}
+                  />
+                ))}
+                {processing.length === 0 && (
+                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[13px]">
+                    No processing requests
                   </div>
                 )}
               </div>
@@ -627,10 +740,10 @@ export default function DashboardPage() {
               className="bg-[#eff4ff] flex-1 min-w-0 relative rounded-[4px]"
               style={{ border: "1px solid #c4c5d5" }}
             >
-              <div className="flex flex-col gap-2 items-start p-[9px] size-full">
+              <div className="flex flex-col gap-2 items-start p-[9px] w-full">
                 <div className="relative w-full shrink-0">
                   <div className="flex flex-col items-start px-2 py-1">
-                    <p className="font-medium text-[16px] leading-6 text-[#444653] uppercase w-full">
+                    <p className="font-medium text-[14px] leading-6 text-[#444653] uppercase w-full">
                       READY FOR PICKUP ({pickup.length})
                     </p>
                   </div>
@@ -639,12 +752,36 @@ export default function DashboardPage() {
                   <PickupCard
                     key={card.id}
                     card={card}
-                    onClaim={markClaimed}
+                    onMarkCompleted={markCompleted}
                   />
                 ))}
                 {pickup.length === 0 && (
-                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[14px]">
+                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[13px]">
                     No documents ready
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Completed */}
+            <div
+              className="bg-[#f0fdf4] flex-1 min-w-0 relative rounded-[4px]"
+              style={{ border: "1px solid #bbf7d0" }}
+            >
+              <div className="flex flex-col gap-2 items-start p-[9px] w-full">
+                <div className="relative w-full shrink-0">
+                  <div className="flex flex-col items-start px-2 py-1">
+                    <p className="font-medium text-[14px] leading-6 text-[#166534] uppercase w-full">
+                      COMPLETED ({completed.length})
+                    </p>
+                  </div>
+                </div>
+                {completed.map((card) => (
+                  <CompletedCard key={card.id} card={card} />
+                ))}
+                {completed.length === 0 && (
+                  <div className="py-8 flex items-center justify-center w-full text-[#747685] text-[13px]">
+                    No completed requests
                   </div>
                 )}
               </div>
@@ -652,7 +789,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Urgencies panel (col 3) */}
+        {/* Urgencies panel (col 4) */}
         <div className="col-span-1">
           <UrgenciesPanel
             missedCalls={missedCalls}

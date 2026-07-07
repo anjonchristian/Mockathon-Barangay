@@ -2,7 +2,7 @@
 // These types bridge the backend API models (from lib/api.ts) to the UI.
 
 /** Kanban statuses used in the dashboard board */
-export type KanbanStatus = "pending" | "processing" | "pickup";
+export type KanbanStatus = "pending" | "processing" | "pickup" | "completed";
 
 /** A card displayed in the Kanban board */
 export interface KanbanCard {
@@ -58,6 +58,78 @@ export interface Registration {
   isVerified: boolean;
   verificationStatus: VerificationStatus;
   verificationNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Blotter Report Models ────────────────────────────────────────────────────
+
+/** Status of a blotter report in the mediation workflow */
+export type BlotterStatus =
+  | "under_review"
+  | "scheduled_mediation"
+  | "resolved"
+  | "escalated_pnp";
+
+/** Incident type classification for a blotter report */
+export type IncidentType =
+  | "noise_complaint"
+  | "property_dispute"
+  | "theft"
+  | "vandalism"
+  | "harassment"
+  | "other";
+
+/**
+ * Blotter — matches the backend Blotter model used by the
+ * /api/blotter endpoints.
+ */
+export interface Blotter {
+  _id: string;
+  reportId: string;
+  firebaseUid: string;
+  incidentType: IncidentType;
+  title: string;
+  description: string;
+  location?: string;
+  personsInvolved?: string;
+  evidencePhotos?: string[];
+  status: BlotterStatus;
+  mediationDate?: string | null;
+  mediationNotes?: string;
+  staffNotes?: string;
+  resolutionNotes?: string;
+  barangayCode: string;
+  barangayName: string;
+  cityMunicipalityCode: string;
+  cityMunicipalityName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ─── Staff Management Models ──────────────────────────────────────────────────
+
+/** Role of a staff member in the barangay system */
+export type StaffRole = "staff" | "admin" | "captain";
+
+/**
+ * Staff — matches the backend Staff model used by the
+ * /api/staff endpoints.
+ */
+export interface Staff {
+  _id: string;
+  firebaseUid?: string;
+  email: string;
+  fullName: string;
+  role: StaffRole;
+  position: string;
+  barangayCode?: string;
+  barangayName?: string;
+  cityMunicipalityCode?: string;
+  cityMunicipalityName?: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  phoneNumber: string;
   createdAt: string;
   updatedAt: string;
 }
