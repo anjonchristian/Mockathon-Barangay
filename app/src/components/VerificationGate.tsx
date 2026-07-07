@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useVerification } from "../context/VerificationContext";
+import { MaterialCommunityIcons, ICONS } from "./Icons";
 
 interface VerificationGateProps {
   /**
@@ -52,7 +53,12 @@ export default function VerificationGate({
           contentContainerStyle={styles.contentContainer}
         >
           <View style={styles.card}>
-            <Text style={styles.icon}>🔒</Text>
+            <MaterialCommunityIcons
+              name={ICONS.VERIFICATION_LOCKED}
+              size={48}
+              color="#000"
+              style={styles.icon}
+            />
             <Text style={styles.title}>Registration Required</Text>
             <Text style={styles.message}>
               You need to complete registration to access {featureName}. This
@@ -90,7 +96,12 @@ export default function VerificationGate({
           contentContainerStyle={styles.contentContainer}
         >
           <View style={styles.card}>
-            <Text style={styles.icon}>⏳</Text>
+            <MaterialCommunityIcons
+              name={ICONS.VERIFICATION_PENDING}
+              size={48}
+              color="#000"
+              style={styles.icon}
+            />
             <Text style={styles.title}>Verification in Progress</Text>
             <Text style={styles.message}>
               Your registration is being reviewed. You'll be notified once
@@ -114,7 +125,12 @@ export default function VerificationGate({
           contentContainerStyle={styles.contentContainer}
         >
           <View style={styles.card}>
-            <Text style={styles.icon}>⚠️</Text>
+            <MaterialCommunityIcons
+              name={ICONS.VERIFICATION_REJECTED}
+              size={48}
+              color="#000"
+              style={styles.icon}
+            />
             <Text style={styles.title}>Verification Rejected</Text>
             <Text style={styles.message}>
               Your registration was not approved. Please contact your barangay

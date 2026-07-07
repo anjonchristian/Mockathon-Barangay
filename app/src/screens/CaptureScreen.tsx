@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { MaterialCommunityIcons, ICONS } from "../components/Icons";
 
 interface CaptureScreenProps {
   onCapture: (base64: string) => void;
@@ -44,7 +45,7 @@ export default function CaptureScreen({ onCapture }: CaptureScreenProps) {
     return (
       <View style={styles.container}>
         <View style={styles.permissionContent}>
-          <Text style={styles.permissionIcon}>📷</Text>
+          <MaterialCommunityIcons name={ICONS.ACTION_CAMERA} size={64} color="#fff" style={styles.permissionIcon} />
           <Text style={styles.permissionText}>Camera permission is required to capture your ID.</Text>
           <Text style={styles.permissionSubtext}>
             We need access to your camera to take a photo of your ID card. Your photos are processed securely and never shared.
@@ -159,7 +160,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   permissionIcon: {
-    fontSize: 64,
     marginBottom: 24,
   },
   permissionText: {

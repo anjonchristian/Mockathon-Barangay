@@ -14,6 +14,7 @@ import {
   logWatchdogTimeout,
   checkStaffStatus,
 } from "../services/webrtcService";
+import { MaterialCommunityIcons, ICONS } from "../components/Icons";
 
 interface VideoCallScreenProps {
   userId: string;
@@ -142,7 +143,7 @@ export default function VideoCallScreen({
     return (
       <View style={styles.container}>
         <View style={styles.centerContent}>
-          <Text style={styles.statusIcon}>📵</Text>
+          <MaterialCommunityIcons name={ICONS.ACTION_PHONE_HANGUP} size={64} color="#fff" style={styles.statusIcon} />
           <Text style={styles.statusTitle}>Staff Unavailable</Text>
           <Text style={styles.statusText}>
             No barangay staff members are currently available for video calls.
@@ -174,7 +175,7 @@ export default function VideoCallScreen({
     return (
       <View style={styles.container}>
         <View style={styles.centerContent}>
-          <Text style={styles.statusIcon}>⏰</Text>
+          <MaterialCommunityIcons name={ICONS.STATUS_WARNING} size={64} color="#fff" style={styles.statusIcon} />
           <Text style={styles.statusTitle}>No Response</Text>
           <Text style={styles.statusText}>
             The staff did not respond within 15 seconds. Would you like to request a callback?
@@ -221,7 +222,7 @@ export default function VideoCallScreen({
         <View style={styles.remoteVideoPlaceholder}>
           {connectionState === "connected" ? (
             <>
-              <Text style={styles.remoteVideoIcon}>👤</Text>
+              <MaterialCommunityIcons name="account" size={80} color="#fff" style={styles.remoteVideoIcon} />
               <Text style={styles.remoteVideoText}>Barangay Staff</Text>
             </>
           ) : (
@@ -241,7 +242,7 @@ export default function VideoCallScreen({
       <View style={styles.localVideo}>
         <View style={styles.localVideoPlaceholder}>
           {isCameraOff ? (
-            <Text style={styles.cameraOffIcon}>📷</Text>
+            <MaterialCommunityIcons name={ICONS.ACTION_VIDEO_OFF} size={32} color="#fff" style={styles.cameraOffIcon} />
           ) : (
             <Text style={styles.selfViewText}>You</Text>
           )}
@@ -263,7 +264,12 @@ export default function VideoCallScreen({
           accessibilityLabel={isMuted ? "Unmute microphone" : "Mute microphone"}
           accessibilityRole="button"
         >
-          <Text style={styles.controlIcon}>{isMuted ? "🔇" : "🎤"}</Text>
+          <MaterialCommunityIcons
+            name={isMuted ? ICONS.ACTION_MIC_OFF : ICONS.ACTION_MIC}
+            size={24}
+            color="#fff"
+            style={styles.controlIcon}
+          />
           <Text style={styles.controlLabel}>{isMuted ? "Unmute" : "Mute"}</Text>
         </TouchableOpacity>
 
@@ -273,7 +279,7 @@ export default function VideoCallScreen({
           accessibilityLabel="End call"
           accessibilityRole="button"
         >
-          <Text style={styles.endCallIcon}>📞</Text>
+          <MaterialCommunityIcons name={ICONS.ACTION_PHONE_HANGUP} size={28} color="#fff" style={styles.endCallIcon} />
           <Text style={styles.endCallLabel}>End</Text>
         </TouchableOpacity>
 
@@ -283,7 +289,12 @@ export default function VideoCallScreen({
           accessibilityLabel={isCameraOff ? "Turn camera on" : "Turn camera off"}
           accessibilityRole="button"
         >
-          <Text style={styles.controlIcon}>{isCameraOff ? "📷" : "📹"}</Text>
+          <MaterialCommunityIcons
+            name={isCameraOff ? ICONS.ACTION_VIDEO_OFF : ICONS.ACTION_VIDEO}
+            size={24}
+            color="#fff"
+            style={styles.controlIcon}
+          />
           <Text style={styles.controlLabel}>{isCameraOff ? "Camera On" : "Camera Off"}</Text>
         </TouchableOpacity>
       </View>
@@ -303,7 +314,6 @@ const styles = StyleSheet.create({
     padding: 32,
   },
   statusIcon: {
-    fontSize: 64,
     marginBottom: 24,
   },
   statusTitle: {
@@ -379,7 +389,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   remoteVideoIcon: {
-    fontSize: 80,
     marginBottom: 16,
   },
   remoteVideoText: {
@@ -410,7 +419,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cameraOffIcon: {
-    fontSize: 32,
     opacity: 0.5,
   },
   selfViewText: {
@@ -454,7 +462,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.35)",
   },
   controlIcon: {
-    fontSize: 24,
     marginBottom: 4,
   },
   controlLabel: {
@@ -471,7 +478,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   endCallIcon: {
-    fontSize: 28,
     marginBottom: 4,
   },
   endCallLabel: {

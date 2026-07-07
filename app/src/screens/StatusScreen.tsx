@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
 import { getRequestStatus } from "../services/api";
+import { MaterialCommunityIcons, ICONS } from "../components/Icons";
 
 interface StatusScreenProps {
   requestId: string;
@@ -36,7 +37,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
     switch (status) {
       case "approved":
         return {
-          icon: "✅",
+          icon: ICONS.STATUS_SUCCESS,
           title: "Approved!",
           subtitle: "Your Barangay ID request has been approved.",
           instruction: "You may now visit the barangay hall to claim your ID.",
@@ -44,7 +45,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
         };
       case "rejected":
         return {
-          icon: "❌",
+          icon: ICONS.STATUS_ERROR,
           title: "Not Approved",
           subtitle:
             "Your Barangay ID request was not approved. Please contact the barangay hall.",
@@ -53,7 +54,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
         };
       default:
         return {
-          icon: "⏳",
+          icon: ICONS.VERIFICATION_PENDING,
           title: "Pending Review",
           subtitle:
             "Your Barangay ID request has been submitted and is pending staff review.",
@@ -68,7 +69,7 @@ export default function StatusScreen({ requestId, onDone }: StatusScreenProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Text style={styles.iconText}>{display.icon}</Text>
+        <MaterialCommunityIcons name={display.icon} size={48} color={display.color} />
       </View>
 
       <Text style={[styles.title, { color: display.color }]}>
@@ -119,9 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     justifyContent: "center",
     alignItems: "center",
-  },
-  iconText: {
-    fontSize: 40,
   },
   title: {
     fontSize: 28,

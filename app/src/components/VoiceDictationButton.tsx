@@ -17,6 +17,7 @@ import {
   clearSilenceTimer,
   showPermissionDeniedAlert,
 } from "../services/voiceService";
+import { MaterialCommunityIcons, ICONS } from "./Icons";
 
 interface VoiceDictationButtonProps {
   onTextReceived: (text: string) => void;
@@ -156,9 +157,11 @@ export default function VoiceDictationButton({
             { transform: [{ scale: pulseAnim }] },
           ]}
         >
-          <Text style={[styles.micIcon, isListening && styles.micIconActive]}>
-            {isListening ? "🔴" : "🎤"}
-          </Text>
+          <MaterialCommunityIcons
+            name={isListening ? ICONS.ACTION_MIC_OFF : ICONS.ACTION_MIC}
+            size={24}
+            color={isListening ? "#DC2626" : "#1a73e8"}
+          />
         </Animated.View>
       </TouchableOpacity>
 
@@ -259,12 +262,6 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
-  },
-  micIcon: {
-    fontSize: 20,
-  },
-  micIconActive: {
-    fontSize: 20,
   },
   modalOverlay: {
     flex: 1,

@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { MaterialCommunityIcons, ICONS } from "../components/Icons";
 
 interface WelcomeScreenProps {
   onGetStarted: () => void;
@@ -10,7 +11,7 @@ export default function WelcomeScreen({ onGetStarted, onSkip }: WelcomeScreenPro
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>🆔</Text>
+          <MaterialCommunityIcons name={ICONS.DOC_BARANGAY_ID} size={56} color="#1a73e8" />
         </View>
         
         <Text style={styles.title}>Welcome to e-Kap</Text>
@@ -86,9 +87,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 32,
-  },
-  icon: {
-    fontSize: 56,
   },
   title: {
     fontSize: 32,

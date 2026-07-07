@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import VoiceDictationButton from "../../components/VoiceDictationButton";
 import VerificationGate from "../../components/VerificationGate";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 import { useVerification } from "../../context/VerificationContext";
 
 type IncidentType =
@@ -78,6 +79,13 @@ const STATUS_STYLES: Record<Report["status"], object> = {
   mediation_scheduled: { backgroundColor: "#DBEAFE" },
   resolved: { backgroundColor: "#D1FAE5" },
   escalated: { backgroundColor: "#FEE2E2" },
+};
+
+const STATUS_ICONS: Record<Report["status"], string> = {
+  under_review: ICONS.STATUS_WARNING,
+  mediation_scheduled: ICONS.STATUS_INFO,
+  resolved: ICONS.STATUS_SUCCESS,
+  escalated: ICONS.STATUS_ERROR,
 };
 
 interface EBlotterScreenProps {
@@ -184,6 +192,12 @@ export default function EBlotterScreen({
                     <View style={styles.reportHeader}>
                       <Text style={styles.reportTitle}>{report.title}</Text>
                       <View style={[styles.statusBadge, STATUS_STYLES[report.status]]}>
+                        <MaterialCommunityIcons
+                          name={STATUS_ICONS[report.status]}
+                          size={12}
+                          color="#333"
+                          style={styles.statusBadgeIcon}
+                        />
                         <Text style={styles.statusText}>{STATUS_LABELS[report.status]}</Text>
                       </View>
                     </View>
@@ -430,10 +444,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 8,
     marginLeft: 12,
+  },
+  statusBadgeIcon: {
+    marginRight: 4,
   },
   statusText: {
     fontSize: 12,
