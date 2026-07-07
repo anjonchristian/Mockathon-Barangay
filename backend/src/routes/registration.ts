@@ -56,6 +56,15 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Normalize cityMunicipalityType to lowercase (case-insensitive)
+    const normalizedType = (payload.cityMunicipalityType || "").toLowerCase();
+    if (!["city", "municipality"].includes(normalizedType)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid cityMunicipalityType",
+      });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ firebaseUid: payload.firebaseUid });
     if (existingUser) {
@@ -77,7 +86,7 @@ router.post("/", async (req, res) => {
       provinceName: payload.provinceName,
       cityMunicipalityCode: payload.cityMunicipalityCode,
       cityMunicipalityName: payload.cityMunicipalityName,
-      cityMunicipalityType: payload.cityMunicipalityType,
+      cityMunicipalityType: normalizedType,
       barangayCode: payload.barangayCode,
       barangayName: payload.barangayName,
       idPhotoBase64: payload.idPhotoBase64,
@@ -115,6 +124,51 @@ router.post("/", async (req, res) => {
       success: false,
       error: "Failed to register user",
     });
+  }
+});
+
+/**
+ * GET /api/registration
+ * List all registrations with optional status filter and pagination
+ */
+router.get("/", async (req, res) => {
+  try {
+    const { status, page = 1, limit = 20 } = req.query;
+    const filter: any = {};
+    if (status && ["pending", "approved", "rejected"].includes(status as string)) {
+      filter.verificationStatus = status;
+    }
+    const skip = (Number(page) - 1) * Number(limit);
+    const users = await User.find(filter)
+      .select("-idPhotoBase64") // Exclude large base64 from list
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+    const total = await User.countDocuments(filter);
+    res.json({
+      success: true,
+      data: users,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+    });
+  } catch (error) {
+    console.error("List registrations error:", error);
+    res.status(500).json({ success: false, error: "Failed to list registrations" });
+  }
+});
+
+/**
+ * GET /api/registration/:firebaseUid/photo
+ * Fetch just the ID photo for a user
+ */
+router.get("/:firebaseUid/photo", async (req, res) => {
+  try {
+    const user = await User.findOne({ firebaseUid: req.params.firebaseUid }).select("idPhotoBase64");
+    if (!user) return res.status(404).json({ success: false, error: "User not found" });
+    res.json({ success: true, data: { idPhotoBase64: user.idPhotoBase64 } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Failed to fetch photo" });
   }
 });
 

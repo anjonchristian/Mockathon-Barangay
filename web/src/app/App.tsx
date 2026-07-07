@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/context/AppContext";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import DashboardPage from "@/pages/DashboardPage";
+import RegistrationVerificationPage from "@/pages/RegistrationVerificationPage";
 import ArchivesPage from "@/pages/ArchivesPage";
 import EBlotterPage from "@/pages/EBlotterPage";
 import EmergencyBroadcastPage from "@/pages/EmergencyBroadcastPage";
@@ -16,6 +17,7 @@ export default function App() {
         <Routes>
           <Route element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="registrations" element={<RegistrationVerificationPage />} />
             <Route path="archives" element={<ArchivesPage />} />
             <Route path="e-blotter" element={<EBlotterPage />} />
             <Route path="emergency" element={<EmergencyBroadcastPage />} />

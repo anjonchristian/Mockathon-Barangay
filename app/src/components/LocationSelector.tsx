@@ -147,9 +147,14 @@ export default function LocationSelector({
   };
 
   const handleCitySelect = (city: City | Municipality) => {
+    // Normalize type to lowercase so the backend enum ("city" | "municipality") matches
+    const normalizedCity: City | Municipality = {
+      ...city,
+      type: city.type.toLowerCase(),
+    };
     setLocation((prev) => ({
       ...prev,
-      cityMunicipality: city,
+      cityMunicipality: normalizedCity,
       barangay: null,
     }));
     setShowCityModal(false);

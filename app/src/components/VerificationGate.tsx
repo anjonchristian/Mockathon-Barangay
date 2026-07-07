@@ -45,6 +45,12 @@ export default function VerificationGate({
     return <>{limitedAccessContent ?? null}</>;
   }
 
+  // Pending user who dismissed the prompt: show limited access content if
+  // provided, otherwise render nothing (feature fully gated).
+  if (verificationStatus === "pending" && dismissed) {
+    return <>{limitedAccessContent ?? null}</>;
+  }
+
   if (verificationStatus === "guest") {
     return (
       <View style={styles.container}>
@@ -104,9 +110,21 @@ export default function VerificationGate({
             />
             <Text style={styles.title}>Verification in Progress</Text>
             <Text style={styles.message}>
-              Your registration is being reviewed. You'll be notified once
-              verified. {featureName} will be available after verification.
+              Your registration is being reviewed by barangay staff. You'll be
+              notified once verified. In the meantime, you can continue with
+              limited access.
             </Text>
+
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={() => setDismissed(true)}
+              accessibilityLabel="Continue with limited access"
+              accessibilityRole="button"
+            >
+              <Text style={styles.secondaryButtonText}>
+                Continue with Limited Access
+              </Text>
+            </TouchableOpacity>
 
             <View style={styles.statusBadge}>
               <Text style={styles.statusText}>Pending Review</Text>

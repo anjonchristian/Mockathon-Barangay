@@ -23,6 +23,45 @@ export interface MissedCallDisplay {
   callbackDone: boolean;
 }
 
+// ─── Citizen Registration Models ──────────────────────────────────────────────
+
+/** Verification status for a citizen registration */
+export type VerificationStatus = "pending" | "approved" | "rejected";
+
+/**
+ * Registration — matches the backend User model used by the
+ * /api/registration endpoints. The list endpoint excludes
+ * `idPhotoBase64` for performance; fetch it separately via
+ * getRegistrationPhoto().
+ */
+export interface Registration {
+  _id: string;
+  firebaseUid: string;
+  fullName: string;
+  email?: string;
+  phoneNumber?: string;
+  regionCode: string;
+  regionName: string;
+  provinceCode: string;
+  provinceName: string;
+  cityMunicipalityCode: string;
+  cityMunicipalityName: string;
+  cityMunicipalityType: "city" | "municipality";
+  barangayCode: string;
+  barangayName: string;
+  idType: string;
+  idNumber?: string;
+  address?: string;
+  birthDate?: string;
+  gender?: string;
+  nationality?: string;
+  isVerified: boolean;
+  verificationStatus: VerificationStatus;
+  verificationNotes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**

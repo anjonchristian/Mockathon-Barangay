@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import axios, { type AxiosError, type AxiosInstance } from "axios";
+import type { Registration, VerificationStatus } from "@/types";
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 
@@ -373,6 +374,118 @@ export async function createMissedCall(
 export async function listMissedCalls(): Promise<MissedCallLog[]> {
   const { data } = await api.get<ApiResponse<MissedCallLog[]>>(
     "/watchdog/missed-calls"
+  );
+
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+// ─── Citizen Registrations ────────────────────────────────────────────────────
+
+/**
+ * Paginated list response shape returned by GET /api/registration.
+ */
+export interface RegistrationListResponse {
+  data: Registration[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * GET /api/registration
+ *
+ * List citizen registrations with optional status filter and pagination.
+ * NOTE: The list endpoint excludes `idPhotoBase64` for performance —
+ * fetch the photo separately via getRegistrationPhoto().
+ *
+ * @param params.status - Filter by verification status (omit for all).
+ * @param params.page   - Page number (default 1).
+ * @param params.limit  - Items per page (default 20).
+ */
+export async function listRegistrations(params?: {
+  status?: VerificationStatus;
+  page?: number;
+  limit?: number;
+}): Promise<RegistrationListResponse> {
+  const query: Record<string, string> = {};
+
+  if (params?.status) query.status = params.status;
+  if (params?.page) query.page = String(params.page);
+  if (params?.limit) query.limit = String(params.limit);
+
+  const { data } = await api.get<RegistrationListResponse>(
+    "/registration",
+    { params: query }
+  );
+
+  return data;
+}
+
+/**
+ * GET /api/registration/:firebaseUid
+ *
+ * Fetch a single citizen registration by Firebase UID.
+ *
+ * @throws {Error} If the registration is not found (404) or server error.
+ */
+export async function getRegistration(firebaseUid: string): Promise<Registration> {
+  const { data } = await api.get<ApiResponse<Registration>>(
+    `/registration/${firebaseUid}`
+  );
+
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+/**
+ * GET /api/registration/:firebaseUid/photo
+ *
+ * Fetch the ID photo (base64) for a registration. Kept separate from the
+ * list endpoint for performance.
+ */
+export async function getRegistrationPhoto(
+  firebaseUid: string
+): Promise<{ idPhotoBase64: string }> {
+  const { data } = await api.get<ApiResponse<{ idPhotoBase64: string }>>(
+    `/registration/${firebaseUid}/photo`
+  );
+
+  if (!isSuccess(data)) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+/**
+ * PUT /api/registration/:firebaseUid/verify
+ *
+ * Approve or reject a citizen registration. Optionally include notes
+ * (required for rejections on the frontend).
+ *
+ * @throws {Error} If status is invalid, registration not found, or server error.
+ *
+ * @example
+ * // Approve
+ * await verifyRegistration("uid123", { status: "approved" });
+ *
+ * // Reject with notes
+ * await verifyRegistration("uid123", { status: "rejected", notes: "Unclear ID photo" });
+ */
+export async function verifyRegistration(
+  firebaseUid: string,
+  payload: { status: "approved" | "rejected"; notes?: string }
+): Promise<Registration> {
+  const { data } = await api.put<ApiResponse<Registration>>(
+    `/registration/${firebaseUid}/verify`,
+    payload
   );
 
   if (!isSuccess(data)) {

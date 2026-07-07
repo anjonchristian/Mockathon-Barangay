@@ -8,15 +8,27 @@ import type { KanbanCard } from "@/types";
 
 // ─── Photo thumbnail ──────────────────────────────────────────────────────────
 
-function PhotoThumb() {
+function PhotoThumb({ photoBase64 }: { photoBase64?: string }) {
   return (
     <div
-      className="bg-[#f1f5f9] relative rounded-sm shrink-0 size-12"
+      className="bg-[#f1f5f9] relative rounded-sm shrink-0 size-12 overflow-clip"
       style={{ border: "1px solid #e2e8f0" }}
     >
-      <div className="flex flex-col items-start justify-center overflow-clip p-px rounded-[inherit] size-full">
-        <div className="flex-1 min-h-px w-full" />
-      </div>
+      {photoBase64 ? (
+        <img
+          src={
+            photoBase64.startsWith("data:")
+              ? photoBase64
+              : `data:image/jpeg;base64,${photoBase64}`
+          }
+          alt="ID photo"
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <div className="flex flex-col items-start justify-center overflow-clip p-px rounded-[inherit] size-full">
+          <div className="flex-1 min-h-px w-full" />
+        </div>
+      )}
     </div>
   );
 }
@@ -44,7 +56,7 @@ function PendingCard({
       <div className="flex flex-col gap-4 items-start p-[17px] size-full">
         <div className="relative w-full flex items-start justify-between">
           <div className="flex gap-4 items-center shrink-0">
-            <PhotoThumb />
+            <PhotoThumb photoBase64={card.photoBase64} />
             <div className="flex flex-col items-start">
               <div className="font-semibold text-[18px] text-[#0b1c30]">
                 {lastName ? (
@@ -113,7 +125,7 @@ function ProcessingCard({ card }: { card: KanbanCard }) {
           <div className="absolute bg-[rgba(0,37,118,0.05)] inset-px" />
           <div className="h-[79.59px] relative w-full">
             <div className="absolute flex gap-4 items-center left-0 top-0">
-              <PhotoThumb />
+              <PhotoThumb photoBase64={card.photoBase64} />
               <div className="flex flex-col items-start">
                 <div className="font-semibold text-[18px] text-[#0b1c30]">
                   {lastName ? (
@@ -472,15 +484,6 @@ export default function DashboardPage() {
   const processing = filteredCards.filter((c) => c.status === "processing");
   const pickup = filteredCards.filter((c) => c.status === "pickup");
   const pendingCount = pending.length + processing.length;
-
-  const toggleSelect = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
 
   const handleBatchApprove = useCallback(async () => {
     const ids = Array.from(selectedIds);

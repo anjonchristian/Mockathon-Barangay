@@ -45,7 +45,7 @@ export default function RegistrationStep3({
         provinceName: location.province?.name || "",
         cityMunicipalityCode: location.cityMunicipality?.code || "",
         cityMunicipalityName: location.cityMunicipality?.name || "",
-        cityMunicipalityType: location.cityMunicipality?.type || "municipality",
+        cityMunicipalityType: (location.cityMunicipality?.type || "municipality").toLowerCase() as "city" | "municipality",
         barangayCode: location.barangay?.code || "",
         barangayName: location.barangay?.name || "",
         idPhotoBase64,

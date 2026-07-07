@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || "http://10.0.2.2:3000/api";
-const WS_URL = process.env.EXPO_PUBLIC_WS_URL || "ws://10.0.2.2:3001";
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || "http://192.168.254.109:3000/api";
+const WS_URL = process.env.EXPO_PUBLIC_WS_URL || "ws://192.168.254.109:3001";
 
 export type CallStatus = "pending" | "connected" | "ended" | "rejected" | "timeout";
 export type CallType = "audio" | "video";

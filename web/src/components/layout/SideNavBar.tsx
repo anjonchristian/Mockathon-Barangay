@@ -1,11 +1,36 @@
 import { useState, useCallback } from "react";
+import type { ComponentType } from "react";
 import { NavLink } from "react-router-dom";
+import { UserCheck } from "lucide-react";
 import { useAppContext } from "@/context/AppContext";
 import svgPaths from "../../imports/Html→Body/svg-7ninsmypt3";
 import { SvgIcon } from "@/components/icons/SvgIcon";
 import { NewRecordDialog } from "@/components/NewRecordDialog";
 
-const NAV_ITEMS = [
+type LucideIconType = ComponentType<{
+  className?: string;
+  color?: string;
+  size?: number | string;
+}>;
+
+type NavItem = {
+  to: string;
+  label: string;
+  icon: { name: keyof typeof svgPaths; vb: string; w: number; h: number };
+  lucideIcon?: never;
+} | {
+  to: string;
+  label: string;
+  lucideIcon: LucideIconType;
+  icon?: never;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    to: "/registrations",
+    label: "Citizen Verification",
+    lucideIcon: UserCheck,
+  },
   {
     to: "/",
     label: "Dashboard",
@@ -41,7 +66,7 @@ const NAV_ITEMS = [
     label: "Settings",
     icon: { name: "p3cdadd00" as keyof typeof svgPaths, vb: "0 0 20.1 20", w: 20.1, h: 20 },
   },
-] as const;
+];
 
 const BOTTOM_ITEMS = [
   {
@@ -133,13 +158,20 @@ export function SideNavBar() {
             >
               {({ isActive }) => (
                 <>
-                  <SvgIcon
-                    name={item.icon.name}
-                    vb={item.icon.vb}
-                    w={item.icon.w}
-                    h={item.icon.h}
-                    fill={isActive ? "#96ADFF" : "#444653"}
-                  />
+                  {item.lucideIcon ? (
+                    <item.lucideIcon
+                      className="size-[18px] shrink-0"
+                      color={isActive ? "#96ADFF" : "#444653"}
+                    />
+                  ) : (
+                    <SvgIcon
+                      name={item.icon.name}
+                      vb={item.icon.vb}
+                      w={item.icon.w}
+                      h={item.icon.h}
+                      fill={isActive ? "#96ADFF" : "#444653"}
+                    />
+                  )}
                   <span
                     className={`font-medium text-[16px] leading-6 ${
                       isActive ? "text-[#96adff]" : "text-[#444653]"
