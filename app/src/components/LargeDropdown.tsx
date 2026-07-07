@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import { MaterialCommunityIcons, ICONS } from "./Icons";
 
 interface DropdownOption {
   label: string;
@@ -96,7 +97,12 @@ export default function LargeDropdown({
         {loading ? (
           <ActivityIndicator size="small" color="#22c55e" />
         ) : (
-          <Text style={styles.chevron}>▼</Text>
+          <MaterialCommunityIcons
+            name={ICONS.ACTION_ARROW_DOWN}
+            size={16}
+            color="#6b7280"
+            style={styles.chevron}
+          />
         )}
       </TouchableOpacity>
 
@@ -123,7 +129,7 @@ export default function LargeDropdown({
                 accessibilityLabel="Close"
                 accessibilityRole="button"
               >
-                <Text style={styles.closeButtonText}>✕</Text>
+                <MaterialCommunityIcons name={ICONS.ACTION_CLOSE} size={24} color="#6b7280" />
               </TouchableOpacity>
             </View>
 
@@ -167,7 +173,11 @@ export default function LargeDropdown({
                       {option.label}
                     </Text>
                     {value === option.value && (
-                      <Text style={styles.checkmark}>✓</Text>
+                      <MaterialCommunityIcons
+                        name={ICONS.ACTION_CHECK}
+                        size={18}
+                        color="#22c55e"
+                      />
                     )}
                   </TouchableOpacity>
                 ))
@@ -222,8 +232,6 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   chevron: {
-    fontSize: 16,
-    color: "#6b7280",
     marginLeft: 12,
   },
   errorContainer: {
@@ -272,11 +280,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  closeButtonText: {
-    fontSize: 24,
-    color: "#6b7280",
-    fontWeight: "600",
-  },
   searchContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -320,10 +323,5 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: "#22c55e",
     fontWeight: "600",
-  },
-  checkmark: {
-    fontSize: 18,
-    color: "#22c55e",
-    fontWeight: "bold",
   },
 });

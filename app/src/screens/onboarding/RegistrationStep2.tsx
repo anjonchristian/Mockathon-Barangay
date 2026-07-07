@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { LocationData } from "../../services/psgcService";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 
 interface RegistrationStep2Props {
   onNext: (idPhotoBase64: string) => void;
@@ -142,7 +143,7 @@ export default function RegistrationStep2({
               accessibilityLabel="Switch camera"
               accessibilityRole="button"
             >
-              <Text style={styles.flipButtonText}>🔄</Text>
+              <MaterialCommunityIcons name={ICONS.ACTION_CAMERA_FLIP} size={24} color="#fff" />
             </TouchableOpacity>
           </View>
         )}
@@ -304,9 +305,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
-  },
-  flipButtonText: {
-    fontSize: 20,
   },
   previewContainer: {
     marginBottom: 16,

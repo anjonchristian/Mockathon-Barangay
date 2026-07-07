@@ -21,6 +21,7 @@ import {
   fetchCitiesMunicipalities,
   fetchBarangays,
 } from "../services/psgcService";
+import { MaterialCommunityIcons, ICONS } from "./Icons";
 
 interface LocationSelectorProps {
   onLocationChange: (location: LocationData) => void;
@@ -198,7 +199,7 @@ export default function LocationSelector({
         <Text style={location.region ? styles.selectedText : styles.placeholderText}>
           {location.region ? location.region.name : "Select Region"}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <MaterialCommunityIcons name={ICONS.ACTION_ARROW_DOWN} size={12} color="#666" />
       </TouchableOpacity>
 
       {/* Province Selector */}
@@ -217,7 +218,7 @@ export default function LocationSelector({
             ? "Select Province"
             : "Select Region First"}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <MaterialCommunityIcons name={ICONS.ACTION_ARROW_DOWN} size={12} color="#666" />
       </TouchableOpacity>
 
       {/* City/Municipality Selector */}
@@ -236,7 +237,7 @@ export default function LocationSelector({
             ? "Select City/Municipality"
             : "Select Province First"}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <MaterialCommunityIcons name={ICONS.ACTION_ARROW_DOWN} size={12} color="#666" />
       </TouchableOpacity>
 
       {/* Barangay Selector */}
@@ -257,7 +258,7 @@ export default function LocationSelector({
             ? "Select Barangay"
             : "Select City/Municipality First"}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <MaterialCommunityIcons name={ICONS.ACTION_ARROW_DOWN} size={12} color="#666" />
       </TouchableOpacity>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
@@ -272,7 +273,7 @@ export default function LocationSelector({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Select Region</Text>
             <TouchableOpacity onPress={() => setShowRegionModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
+              <MaterialCommunityIcons name={ICONS.ACTION_CLOSE} size={24} color="#666" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -314,7 +315,7 @@ export default function LocationSelector({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Select Province</Text>
             <TouchableOpacity onPress={() => setShowProvinceModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
+              <MaterialCommunityIcons name={ICONS.ACTION_CLOSE} size={24} color="#666" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -356,7 +357,7 @@ export default function LocationSelector({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Select City/Municipality</Text>
             <TouchableOpacity onPress={() => setShowCityModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
+              <MaterialCommunityIcons name={ICONS.ACTION_CLOSE} size={24} color="#666" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -401,7 +402,7 @@ export default function LocationSelector({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Select Barangay</Text>
             <TouchableOpacity onPress={() => setShowBarangayModal(false)}>
-              <Text style={styles.closeButton}>✕</Text>
+              <MaterialCommunityIcons name={ICONS.ACTION_CLOSE} size={24} color="#666" />
             </TouchableOpacity>
           </View>
           <TextInput
@@ -471,10 +472,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#999",
   },
-  arrow: {
-    fontSize: 12,
-    color: "#666",
-  },
   errorText: {
     fontSize: 14,
     color: "#DC2626",
@@ -496,11 +493,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     color: "#000",
-  },
-  closeButton: {
-    fontSize: 24,
-    color: "#666",
-    paddingHorizontal: 8,
   },
   searchInput: {
     margin: 16,

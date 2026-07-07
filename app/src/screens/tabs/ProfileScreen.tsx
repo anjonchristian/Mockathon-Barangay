@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useVerification } from "../../context/VerificationContext";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 
 type VerificationStatus = "guest" | "pending" | "approved" | "rejected";
 
@@ -55,15 +56,15 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
   const displayName = verificationStatus === "guest" ? "Guest User" : fullName || "User";
   const statusColor = STATUS_COLORS[verificationStatus];
   const statusLabel = STATUS_LABELS[verificationStatus];
-  const initials =
-    verificationStatus === "guest"
-      ? "👤"
-      : (fullName || "U")
-          .split(" ")
-          .map((part) => part[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase();
+  const isGuest = verificationStatus === "guest";
+  const initials = isGuest
+    ? ""
+    : (fullName || "U")
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
 
   return (
     <View style={styles.container}>
@@ -71,7 +72,11 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
         {/* Header */}
         <View style={styles.header}>
           <View style={[styles.avatar, { backgroundColor: statusColor }]}>
-            <Text style={styles.avatarText}>{initials}</Text>
+            {isGuest ? (
+              <MaterialCommunityIcons name={ICONS.TAB_PROFILE} size={48} color="#fff" />
+            ) : (
+              <Text style={styles.avatarText}>{initials}</Text>
+            )}
           </View>
           <Text style={styles.name}>{displayName}</Text>
           {verificationStatus !== "guest" && (
@@ -93,7 +98,12 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
           {isRefreshing ? (
             <ActivityIndicator size="small" color="#000" />
           ) : (
-            <Text style={styles.refreshIcon}>🔄</Text>
+            <MaterialCommunityIcons
+              name={ICONS.PROFILE_REFRESH}
+              size={18}
+              color="#000"
+              style={styles.refreshIcon}
+            />
           )}
           <Text style={styles.refreshText}>
             {isRefreshing ? "Refreshing..." : "Refresh Status"}
@@ -105,7 +115,12 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
           <View style={styles.section}>
             <View style={styles.actionCard}>
               <View style={styles.actionCardHeader}>
-                <Text style={styles.actionCardIcon}>📝</Text>
+                <MaterialCommunityIcons
+                  name={ICONS.PROFILE_REGISTER}
+                  size={24}
+                  color="#000"
+                  style={styles.actionCardIcon}
+                />
                 <Text style={styles.actionCardTitle}>Complete Your Registration</Text>
               </View>
               <Text style={styles.actionCardMessage}>
@@ -128,7 +143,12 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
         {verificationStatus === "pending" && (
           <View style={styles.section}>
             <View style={[styles.statusCard, { borderColor: STATUS_COLORS.pending }]}>
-              <Text style={styles.statusCardIcon}>⏳</Text>
+              <MaterialCommunityIcons
+                name={ICONS.VERIFICATION_PENDING}
+                size={24}
+                color={STATUS_COLORS.pending}
+                style={styles.statusCardIcon}
+              />
               <Text style={styles.statusCardText}>
                 Your registration is being reviewed by barangay staff. This usually takes 1-2
                 business days.
@@ -141,7 +161,12 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
         {verificationStatus === "rejected" && (
           <View style={styles.section}>
             <View style={[styles.statusCard, { borderColor: STATUS_COLORS.rejected }]}>
-              <Text style={styles.statusCardIcon}>⚠️</Text>
+              <MaterialCommunityIcons
+                name={ICONS.VERIFICATION_REJECTED}
+                size={24}
+                color={STATUS_COLORS.rejected}
+                style={styles.statusCardIcon}
+              />
               <Text style={styles.statusCardText}>
                 Your registration was not approved. Please visit your barangay office or contact
                 support.
@@ -172,7 +197,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}>
-                <Text style={styles.iconText}>🆔</Text>
+                <MaterialCommunityIcons name={ICONS.PROFILE_ID} size={20} color="#000" />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Government ID</Text>
@@ -184,7 +209,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}>
-                <Text style={styles.iconText}>📍</Text>
+                <MaterialCommunityIcons name={ICONS.PROFILE_ADDRESS} size={20} color="#000" />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Registered Address</Text>
@@ -194,7 +219,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
             <View style={styles.infoRow}>
               <View style={styles.infoIcon}>
-                <Text style={styles.iconText}>📱</Text>
+                <MaterialCommunityIcons name={ICONS.PROFILE_PHONE} size={20} color="#000" />
               </View>
               <View style={styles.infoContent}>
                 <Text style={styles.infoLabel}>Contact Number</Text>
@@ -216,7 +241,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
             <>
               <TouchableOpacity style={styles.infoRow}>
                 <View style={styles.infoIcon}>
-                  <Text style={styles.iconText}>📄</Text>
+                  <MaterialCommunityIcons name={ICONS.PROFILE_DOCUMENTS} size={20} color="#000" />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Document Requests</Text>
@@ -227,7 +252,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
               <TouchableOpacity style={styles.infoRow}>
                 <View style={styles.infoIcon}>
-                  <Text style={styles.iconText}>📋</Text>
+                  <MaterialCommunityIcons name={ICONS.PROFILE_BLOTTER} size={20} color="#000" />
                 </View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Blotter Reports</Text>
@@ -245,7 +270,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
           <TouchableOpacity style={styles.infoRow}>
             <View style={styles.infoIcon}>
-              <Text style={styles.iconText}>🔔</Text>
+              <MaterialCommunityIcons name={ICONS.PROFILE_NOTIFICATIONS} size={20} color="#000" />
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Notifications</Text>
@@ -256,7 +281,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
           <TouchableOpacity style={styles.infoRow}>
             <View style={styles.infoIcon}>
-              <Text style={styles.iconText}>🔐</Text>
+              <MaterialCommunityIcons name={ICONS.PROFILE_PRIVACY} size={20} color="#000" />
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Privacy & Security</Text>
@@ -266,7 +291,7 @@ export default function ProfileScreen({ onCompleteRegistration }: ProfileScreenP
 
           <TouchableOpacity style={styles.infoRow}>
             <View style={styles.infoIcon}>
-              <Text style={styles.iconText}>❓</Text>
+              <MaterialCommunityIcons name={ICONS.PROFILE_HELP} size={20} color="#000" />
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Help & Support</Text>
@@ -346,7 +371,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E5E5E5",
   },
   refreshIcon: {
-    fontSize: 18,
     marginRight: 8,
   },
   refreshText: {
@@ -376,7 +400,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   actionCardIcon: {
-    fontSize: 24,
     marginRight: 10,
   },
   actionCardTitle: {
@@ -401,7 +424,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   statusCardIcon: {
-    fontSize: 24,
     marginRight: 12,
   },
   statusCardText: {
@@ -453,9 +475,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
-  },
-  iconText: {
-    fontSize: 20,
   },
   infoContent: {
     flex: 1,

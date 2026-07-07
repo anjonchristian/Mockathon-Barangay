@@ -1,6 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons, ICONS } from "../components/Icons";
 import DocumentsScreen from "../screens/tabs/DocumentsScreen";
 import EBlotterScreen from "../screens/tabs/EBlotterScreen";
 import AIAssistantScreen from "../screens/tabs/AIAssistantScreen";
@@ -15,15 +16,19 @@ interface MainTabNavigatorProps {
 
 function TabBarIcon({ name, focused }: { name: string; focused: boolean }) {
   const icons: { [key: string]: string } = {
-    Documents: "📄",
-    "e-Blotter": "📋",
-    "AI Assistant": "🤖",
-    Profile: "👤",
+    Documents: ICONS.TAB_DOCUMENTS,
+    "e-Blotter": ICONS.TAB_EBLOTTER,
+    "AI Assistant": ICONS.TAB_AI_ASSISTANT,
+    Profile: ICONS.TAB_PROFILE,
   };
 
   return (
     <View style={[styles.iconContainer, focused && styles.iconContainerFocused]}>
-      <Text style={styles.icon}>{icons[name] || "•"}</Text>
+      <MaterialCommunityIcons
+        name={icons[name] || ICONS.TAB_PROFILE}
+        size={24}
+        color={focused ? "#000" : "#666"}
+      />
     </View>
   );
 }
@@ -83,9 +88,6 @@ const styles = StyleSheet.create({
   },
   iconContainerFocused: {
     backgroundColor: "#E6F4FE",
-  },
-  icon: {
-    fontSize: 24,
   },
   tabBarLabel: {
     fontSize: 12,

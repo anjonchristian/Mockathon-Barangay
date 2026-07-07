@@ -15,6 +15,7 @@ import {
   sendChatMessage,
   checkStaffStatus,
 } from "../../services/webrtcService";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 import { useVerification } from "../../context/VerificationContext";
 import VideoCallScreen from "../VideoCallScreen";
 
@@ -314,7 +315,11 @@ export default function AIAssistantScreen({
           accessibilityRole="button"
           accessibilityState={{ disabled: !inputText.trim() || isLoading }}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <MaterialCommunityIcons
+            name={ICONS.ACTION_SEND}
+            size={20}
+            color={!inputText.trim() || isLoading ? "#999" : "#fff"}
+          />
         </TouchableOpacity>
       </View>
 
@@ -344,13 +349,25 @@ export default function AIAssistantScreen({
             : "Complete registration to access this feature"
         }
       >
-        <Text style={styles.talkToOfficialButtonText}>
-          {verificationStatus === "approved"
-            ? staffAvailable
-              ? "📞 Talk to an Official"
-              : "📞 Request Callback"
-            : "🔒 Complete Registration to talk to staff"}
-        </Text>
+        <View style={styles.talkToOfficialButtonContent}>
+          <MaterialCommunityIcons
+            name={
+              verificationStatus === "approved"
+                ? ICONS.ACTION_PHONE
+                : ICONS.VERIFICATION_LOCKED
+            }
+            size={20}
+            color="#fff"
+            style={styles.talkToOfficialButtonIcon}
+          />
+          <Text style={styles.talkToOfficialButtonText}>
+            {verificationStatus === "approved"
+              ? staffAvailable
+                ? "Talk to an Official"
+                : "Request Callback"
+              : "Complete Registration to talk to staff"}
+          </Text>
+        </View>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -499,15 +516,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     justifyContent: "center",
     alignItems: "center",
-    minWidth: 80,
+    minWidth: 56,
   },
   disabledButton: {
     backgroundColor: "#E5E5E5",
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
   },
   talkToOfficialButton: {
     backgroundColor: "#10B981",
@@ -524,6 +536,14 @@ const styles = StyleSheet.create({
   },
   talkToOfficialButtonLocked: {
     backgroundColor: "#4B5563",
+  },
+  talkToOfficialButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  talkToOfficialButtonIcon: {
+    marginRight: 8,
   },
   talkToOfficialButtonText: {
     color: "#fff",

@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons, ICONS } from "./Icons";
 
 interface ProgressBarProps {
   currentStep: number;
@@ -34,16 +35,23 @@ export default function ProgressBar({ currentStep, totalSteps }: ProgressBarProp
                   isPending && styles.stepCirclePending,
                 ]}
               >
-                <Text
-                  style={[
-                    styles.stepNumber,
-                    isCompleted && styles.stepNumberCompleted,
-                    isCurrent && styles.stepNumberCurrent,
-                    isPending && styles.stepNumberPending,
-                  ]}
-                >
-                  {isCompleted ? "✓" : stepNumber}
-                </Text>
+                {isCompleted ? (
+                  <MaterialCommunityIcons
+                    name={ICONS.ACTION_CHECK}
+                    size={20}
+                    color="#fff"
+                  />
+                ) : (
+                  <Text
+                    style={[
+                      styles.stepNumber,
+                      isCurrent && styles.stepNumberCurrent,
+                      isPending && styles.stepNumberPending,
+                    ]}
+                  >
+                    {stepNumber}
+                  </Text>
+                )}
               </View>
               <Text
                 style={[
@@ -125,9 +133,6 @@ const styles = StyleSheet.create({
   stepNumber: {
     fontSize: 16,
     fontWeight: "bold",
-  },
-  stepNumberCompleted: {
-    color: "#fff",
   },
   stepNumberCurrent: {
     color: "#fff",

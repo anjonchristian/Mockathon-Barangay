@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } fr
 import { LocationData, formatLocation } from "../../services/psgcService";
 import { registerUser, RegistrationPayload } from "../../services/api";
 import { getAuth } from "firebase/auth";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 
 interface RegistrationStep3Props {
   onComplete: () => void;
@@ -91,7 +92,7 @@ export default function RegistrationStep3({
         {isComplete ? (
           <>
             <View style={styles.successIcon}>
-              <Text style={styles.successIconText}>✓</Text>
+              <MaterialCommunityIcons name={ICONS.STATUS_SUCCESS} size={48} color="#fff" />
             </View>
             <Text style={styles.title}>Registration Complete!</Text>
             <Text style={styles.subtitle}>
@@ -113,7 +114,7 @@ export default function RegistrationStep3({
               <View style={styles.divider} />
 
               <Text style={styles.summaryLabel}>ID Photo</Text>
-              <Text style={styles.summaryValue}>Captured ✓</Text>
+              <Text style={styles.summaryValue}>Captured</Text>
 
               <View style={styles.divider} />
 
@@ -211,11 +212,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 32,
     alignSelf: "center",
-  },
-  successIconText: {
-    fontSize: 48,
-    color: "#fff",
-    fontWeight: "bold",
   },
   title: {
     fontSize: 28,

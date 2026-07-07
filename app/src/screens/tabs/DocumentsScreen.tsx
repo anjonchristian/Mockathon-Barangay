@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import VoiceDictationButton from "../../components/VoiceDictationButton";
 import VerificationGate from "../../components/VerificationGate";
+import { MaterialCommunityIcons, ICONS } from "../../components/Icons";
 import { useVerification } from "../../context/VerificationContext";
 
 type DocumentType =
@@ -31,25 +32,25 @@ const DOCUMENT_OPTIONS: DocumentOption[] = [
     type: "barangay_clearance",
     title: "Barangay Clearance",
     description: "Certificate of good moral character",
-    icon: "📄",
+    icon: ICONS.DOC_BARANGAY_CLEARANCE,
   },
   {
     type: "certificate_of_indigency",
     title: "Certificate of Indigency",
     description: "For financial assistance applications",
-    icon: "💳",
+    icon: ICONS.DOC_CERTIFICATE_INDIGENCY,
   },
   {
     type: "barangay_id",
     title: "Barangay ID",
     description: "Official barangay identification card",
-    icon: "🆔",
+    icon: ICONS.DOC_BARANGAY_ID,
   },
   {
     type: "certificate_of_residency",
     title: "Certificate of Residency",
     description: "Proof of address in the barangay",
-    icon: "🏠",
+    icon: ICONS.DOC_CERTIFICATE_RESIDENCY,
   },
 ];
 
@@ -239,7 +240,7 @@ export default function DocumentsScreen({
                 accessibilityRole="button"
               >
                 <View style={styles.documentIcon}>
-                  <Text style={styles.iconText}>{doc.icon}</Text>
+                  <MaterialCommunityIcons name={doc.icon} size={24} color="#000" />
                 </View>
                 <View style={styles.documentInfo}>
                   <Text style={styles.documentTitle}>{doc.title}</Text>
@@ -304,9 +305,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 16,
-  },
-  iconText: {
-    fontSize: 24,
   },
   documentInfo: {
     flex: 1,
