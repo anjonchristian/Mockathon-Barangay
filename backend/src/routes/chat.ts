@@ -434,51 +434,67 @@ router.post("/", chatRateLimiter, async (req, res) => {
     // Append the current user message
     contents.push({ role: "user", parts: [{ text: sanitized }] });
 
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      const result = await model.generateContent({ contents });
-      const rawResponse = result.response.text();
-      const filtered = filterOutput(rawResponse);
+    // Try multiple models in order - flash-lite has more generous free tier,
+    // flash is higher quality, then fall back to FAQ if all fail.
+    const modelsToTry = ["gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-1.5-flash"];
 
-      const suggestedActions = detectSuggestedActions(filtered);
-      const lowerSanitized = sanitized.toLowerCase();
-      const canEscalate = !lowerSanitized.includes("emergency");
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent({ contents });
+        const rawResponse = result.response.text();
+        const filtered = filterOutput(rawResponse);
 
-      // Store in conversation history
-      pushConversation(historyKey, {
-        role: "user",
-        content: sanitized,
-        timestamp: new Date().toISOString(),
-      });
-      pushConversation(historyKey, {
-        role: "assistant",
-        content: filtered,
-        timestamp: new Date().toISOString(),
-      });
+        const suggestedActions = detectSuggestedActions(filtered);
+        const lowerSanitized = sanitized.toLowerCase();
+        const canEscalate = !lowerSanitized.includes("emergency");
 
-      return res.json({
-        success: true,
-        data: {
-          message: filtered,
-          canEscalate,
-          staffAvailable,
-          suggestedActions: suggestedActions.length > 0 ? suggestedActions : undefined,
-        },
-      });
-    } catch (geminiError) {
-      // Gemini failed (timeout, API error, etc.) - fall back to FAQ
-      console.error("Gemini chat error, falling back to FAQ:", geminiError);
-      const fallback = faqFallback(sanitized);
-      return res.json({
-        success: true,
-        data: {
-          message: fallback.answer,
-          canEscalate: fallback.canEscalate,
-          staffAvailable,
-          suggestedActions: fallback.suggestedActions.length > 0 ? fallback.suggestedActions : undefined,
-        },
-      });
+        // Store in conversation history
+        pushConversation(historyKey, {
+          role: "user",
+          content: sanitized,
+          timestamp: new Date().toISOString(),
+        });
+        pushConversation(historyKey, {
+          role: "assistant",
+          content: filtered,
+          timestamp: new Date().toISOString(),
+        });
+
+        return res.json({
+          success: true,
+          data: {
+            message: filtered,
+            canEscalate,
+            staffAvailable,
+            suggestedActions: suggestedActions.length > 0 ? suggestedActions : undefined,
+          },
+        });
+      } catch (modelError: any) {
+        // 429 = quota exceeded for this model, try the next one
+        // 404 = model not found, try the next one
+        const status = modelError?.status ?? modelError?.statusText;
+        console.error(`Gemini model ${modelName} failed (status: ${status}):`, modelError?.message ?? modelError);
+        if (status !== 429 && status !== "429" && status !== 404 && status !== "404" && status !== "Too Many Requests") {
+          // For other errors (network, auth, etc.), stop trying and fall back to FAQ
+          break;
+        }
+        // Continue to next model
+      }
     }
+
+    // All Gemini models failed - fall back to FAQ
+    console.error("All Gemini models exhausted, falling back to FAQ");
+    const fallback = faqFallback(sanitized);
+    return res.json({
+      success: true,
+      data: {
+        message: fallback.answer,
+        canEscalate: fallback.canEscalate,
+        staffAvailable,
+        suggestedActions: fallback.suggestedActions.length > 0 ? fallback.suggestedActions : undefined,
+      },
+    });
   } catch (error) {
     console.error("Chat error:", error);
     res.status(500).json({
