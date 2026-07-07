@@ -200,10 +200,9 @@ export async function fetchCitiesMunicipalities(
   }
 
   try {
-    // Use non-versioned API with province_code filter parameter
+    // Use nested endpoint, consistent with provinces and barangays
     const response = await psgcApi.get<(City | Municipality)[]>(
-      `/cities-municipalities`,
-      { params: { province_code: provinceCode } }
+      `/provinces/${provinceCode}/cities-municipalities`
     );
     const citiesMunicipalities = response.data;
 
